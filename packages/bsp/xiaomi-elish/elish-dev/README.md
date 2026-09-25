@@ -214,6 +214,29 @@ for i in range(24):
           '%d kHz' % (19200000 * (w & 0xff) // 1000))
 ```
 
+**换 DTB 时最容易踩的坑：`/boot/vmlinuz-$KVER` 不是当前跑的内核**
+- 现场 `/boot/vmlinuz-6.12.58-current-sm8250` 是**原厂 Armbian 内核**
+  （`build@armbian` #1，2025-11-13，gcc 11.4，49.5 MB），而实际在跑的是自制的
+  `#59 SMP Fri Sep 25 14:02:09 CST 2026`（`axis@CHENYU-GEEKPRO`，gcc-12，
+  PC 上 `build/linux-6.12.58/arch/arm64/boot/Image` = 42 463 744 B）。
+  ABL 钩子 `zz-update-abl-kernel` 取的是 `/boot/vmlinuz` ⇒ **直接跑钩子会把启动镜像
+  悄悄换回原厂内核**（bq2597x/elish 自制模块就不是配套内核了）。
+  正确顺序：先把自制 `Image` 装到 `/boot/vmlinuz-$KVER`（原厂那份先备份），再跑钩子。
+- 校验方法（Android boot 头里 `kernel_addr=0x8000` 是**加载地址**，文件偏移是
+  `page_size`=0x1000；kernel blob = `Image.gz` + 紧随其后的 DTB）：
+
+  ```python
+  d = open('/boot/armbian-kernel-csot.img','rb').read()
+  ksize = int.from_bytes(d[8:12],'little'); page = int.from_bytes(d[36:40],'little')
+  blob = d[page:page+ksize]                      # kernel blob
+  fdt  = blob.find(b'\xd0\x0d\xfe\xed')          # DTB 紧跟 gzip 之后
+  open('/tmp/k.gz','wb').write(blob[:fdt]); open('/tmp/k.dtb','wb').write(blob[fdt:])
+  # gzip -dc /tmp/k.gz | md5sum  应等于自制 Image 的 md5
+  ```
+
+  本次实测：镜像内解出的 Image md5 = `0dd8dc6a4e702078e9b68953c847f609`
+  = PC 上 `Image`（#59）= 重启前 live 内核 blob，三者一致。
+
 **构建环境注意（本次踩到）**
 - 远端 `/home/axis/axis_rnd/work/kernel/build/linux-6.12.58` 是**脏树**（之前手工改过
   `pm8150b.dtsi` 等），再跑一遍补丁序列会出现 `charger@1000` / `fuel-gauge@4000`
