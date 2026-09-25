@@ -126,15 +126,31 @@ static void elish_batt_poll(struct work_struct *w)
 	else
 		status = POWER_SUPPLY_STATUS_UNKNOWN;
 
+	int new_status = status;
+	int new_cap = n ? capacity : 0;
+	int new_v = n ? vsum : 0;
+	int new_i = n ? isum / n : 0;
+	int new_p = n ? (int)psum : 0;
+	int new_t = n ? temp : 0;
+	bool changed;
+
 	mutex_lock(&b->lock);
-	b->status = status;
-	b->capacity = n ? capacity : 0;
-	b->vnow = n ? vsum : 0;
-	b->inow = n ? isum / n : 0;
-	b->pnow = n ? (int)psum : 0;
-	b->temp = n ? temp : 0;
+	changed = (b->status != new_status || b->capacity != new_cap ||
+		   b->vnow != new_v || b->inow != new_i ||
+		   b->pnow != new_p || b->temp != new_t ||
+		   b->present != any_present);
+	b->status = new_status;
+	b->capacity = new_cap;
+	b->vnow = new_v;
+	b->inow = new_i;
+	b->pnow = new_p;
+	b->temp = new_t;
 	b->present = any_present;
 	mutex_unlock(&b->lock);
+
+	/* 值有变化才发 uevent，避免每 2s 无谓唤醒 upower */
+	if (changed && b->psy)
+		power_supply_changed(b->psy);
 
 	schedule_delayed_work(&b->poll, msecs_to_jiffies(ELISH_POLL_MS));
 }

@@ -73,6 +73,14 @@ Mi Pad 5 Pro（elish, SM8250-AC / 骁龙 870）在 mainline 内核上的全部�
 **不需要改 DTB**（按名字找已有的表计节点）。btop 侧在 `~/.config/btop/btop.conf`
 设 `selected_battery = "battery"`（btop 只在退出时写回配置，改完要重启 btop）。
 
+GNOME Shell 侧（Vitals 扩展 85）：见 `work/gnome/vitals-battery/`（补丁 + `install.sh`）。
+Vitals 的电池区块只认 `BAT0/BAT1/BAT2/BATT/CMB0/CMB1/CMB2/macsmc-battery` 八个硬编码
+名字（读 `<name>/uevent`），本机节点叫 `battery`；而且它的电池区块**原本不显示温度**。
+补丁：`BATTERY_PATHS` 增加 `8: 'battery'`（prefs.ui 下拉同步加一项），电池区块新增
+`Temperature`（uevent TEMP 是 0.1℃，`temp` 渲染按毫摄氏度要先 ×100）与 `Current`
+（uevent CURRENT_NOW 是 µA，交给 `milliamp` 渲染除 1000）两行，再设
+`battery-slot=8` 并重载扩展。实测显示：`Charging / 47% / 8.465V / 42.6℃ / 4179mA / +35.4W`。
+
 ### 8. 运行期约束（重要，踩过的坑）
 - 当前运行内核把模块的退出段丢掉了，`/proc/modules` 里**所有模块都是
   `[permanent]`**（`mod->init && !mod->exit`）⇒ **任何模块都 rmmod 不掉（EBUSY）**。

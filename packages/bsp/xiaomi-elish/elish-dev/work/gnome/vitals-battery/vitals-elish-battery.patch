@@ -1,0 +1,39 @@
+--- a/sensors.js
++++ b/sensors.js
+@@ -432,7 +432,8 @@
+             4: 'CMB0',
+             5: 'CMB1',
+             6: 'CMB2',
+-            7: 'macsmc-battery'
++            7: 'macsmc-battery',
++            8: 'battery'  // elish: 2S 电池包聚合节点（elish_batt_agg 模块）
+         };
+ 
+         // uevent has all necessary fields, no need to read individual files
+@@ -456,6 +457,16 @@
+                 this._returnValue(callback, 'Voltage', output['VOLTAGE_NOW'] / 1000, 'battery', 'in');
+             }
+ 
++            // elish: 电池温度（uevent TEMP 是 0.1℃，'temp' 渲染按毫摄氏度再除 1000）
++            if ('TEMP' in output) {
++                this._returnValue(callback, 'Temperature', output['TEMP'] * 100, 'battery', 'temp');
++            }
++
++            // elish: 整包电流（uevent CURRENT_NOW 是 µA，'milliamp' 渲染除 1000 得 mA）
++            if ('CURRENT_NOW' in output) {
++                this._returnValue(callback, 'Current', output['CURRENT_NOW'], 'battery', 'milliamp');
++            }
++
+             if ('CAPACITY_LEVEL' in output) {
+                 this._returnValue(callback, 'Level', output['CAPACITY_LEVEL'], 'battery', '');
+             }
+--- a/prefs.ui
++++ b/prefs.ui
+@@ -947,6 +947,7 @@
+                   <item translatable="yes">CMB1</item>
+                   <item translatable="yes">CMB2</item>
+                   <item translatable="yes">macsmc-battery</item>
++                  <item translatable="yes">battery (elish 2S pack)</item>
+                 </items>
+               </object>
+             </child>
