@@ -1,0 +1,374 @@
+diff --git a/sound/soc/qcom/qdsp6/q6asm-dai.c b/sound/soc/qcom/qdsp6/q6asm-dai.c
+index a400c9a..842ffc6 100644
+--- a/sound/soc/qcom/qdsp6/q6asm-dai.c
++++ b/sound/soc/qcom/qdsp6/q6asm-dai.c
+@@ -269,7 +269,8 @@ static int q6asm_dai_prepare(struct snd_soc_component *component,
+ 
+ 	prtd->session_id = q6asm_get_session_id(prtd->audio_client);
+ 	ret = q6routing_stream_open(soc_prtd->dai_link->id, LEGACY_PCM_MODE,
+-			      prtd->session_id, substream->stream);
++			      prtd->session_id, substream->stream,
++			      prtd->audio_client);
+ 	if (ret) {
+ 		dev_err(dev, "%s: stream reg failed ret:%d\n", __func__, ret);
+ 		goto routing_err;
+@@ -443,11 +444,18 @@ static int q6asm_dai_close(struct snd_soc_component *component,
+ 
+ 		q6asm_unmap_memory_regions(substream->stream,
+ 					   prtd->audio_client);
+-		q6asm_audio_client_free(prtd->audio_client);
+-		prtd->audio_client = NULL;
+ 	}
++	/*
++	 * Deregister the route (which drops the session's ASM client pointer)
++	 * before freeing the client, so a concurrent volume write cannot use a
++	 * stale pointer.
++	 */
+ 	q6routing_stream_close(soc_prtd->dai_link->id,
+ 						substream->stream);
++	if (prtd->audio_client) {
++		q6asm_audio_client_free(prtd->audio_client);
++		prtd->audio_client = NULL;
++	}
+ 	kfree(prtd);
+ 	return 0;
+ }
+@@ -672,10 +680,13 @@ static int q6asm_dai_compr_free(struct snd_soc_component *component,
+ 		snd_dma_free_pages(&prtd->dma_buffer);
+ 		q6asm_unmap_memory_regions(stream->direction,
+ 					   prtd->audio_client);
++	}
++	/* drop the session's ASM client pointer before freeing the client */
++	q6routing_stream_close(rtd->dai_link->id, stream->direction);
++	if (prtd->audio_client) {
+ 		q6asm_audio_client_free(prtd->audio_client);
+ 		prtd->audio_client = NULL;
+ 	}
+-	q6routing_stream_close(rtd->dai_link->id, stream->direction);
+ 	kfree(prtd);
+ 
+ 	return 0;
+@@ -898,7 +909,7 @@ static int q6asm_dai_compr_set_params(struct snd_soc_component *component,
+ 
+ 	prtd->session_id = q6asm_get_session_id(prtd->audio_client);
+ 	ret = q6routing_stream_open(rtd->dai_link->id, LEGACY_PCM_MODE,
+-			      prtd->session_id, dir);
++			      prtd->session_id, dir, prtd->audio_client);
+ 	if (ret) {
+ 		dev_err(dev, "Stream reg failed ret:%d\n", ret);
+ 		goto q6_err;
+diff --git a/sound/soc/qcom/qdsp6/q6asm.c b/sound/soc/qcom/qdsp6/q6asm.c
+index 67e9ca1..d0ec5ba 100644
+--- a/sound/soc/qcom/qdsp6/q6asm.c
++++ b/sound/soc/qcom/qdsp6/q6asm.c
+@@ -55,6 +55,29 @@
+ #define ASM_DATA_CMD_REMOVE_INITIAL_SILENCE	0x00010D67
+ #define ASM_DATA_CMD_REMOVE_TRAILING_SILENCE	0x00010D68
+ 
++/*
++ * ASM stream "set post-processing parameters" (in-band).
++ *
++ * V3 carries an instance ID in the parameter header (param_hdr_v3), V2 uses
++ * param_hdr_v1.  The parameter payload is identical to the ADM COPP volume
++ * control (AUDPROC/ASM module 0x00010BFE, parameter 0x00010BFF), which is
++ * exactly what SOFT_VOLUME_INSTANCE_1 maps to downstream.
++ */
++#define ASM_STREAM_CMD_SET_PP_PARAMS_V2		0x00010DA1
++#define ASM_STREAM_CMD_SET_PP_PARAMS_V3		0x0001320D
++
++#define ASM_MODULE_ID_VOL_CTRL			0x00010BFE
++#define ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN	0x00010BFF
++#define ASM_INSTANCE_ID_0			0x0000
++
++/* ASM service API version that introduced instance IDs (param_hdr_v3) */
++#define ASM_API_VERSION_INSTANCE_ID		3
++
++/* The DSP expects the playback stream id from 1 (see q6asm-dai.c) */
++#define ASM_PLAYBACK_STREAM_ID			1
++
++/* 1.0 (0 dB) in Q13, the format the ADSP volume module expects */
++#define ASM_VOLUME_0DB_Q13			0x2000
+ 
+ #define ASM_LEGACY_STREAM_SESSION	0
+ /* Bit shift for the stream_perf_mode subfield. */
+@@ -238,6 +261,46 @@ struct asm_session_cmd_run_v2 {
+ 	u32 time_msw;
+ } __packed;
+ 
++/*
++ * In-band ASM SET_PP_PARAMS command.  mem_hdr stays zeroed for in-band data
++ * and the packed parameter header + payload follow payload_size.  The layout
++ * matches the downstream struct asm_stream_cmd_set_pp_params.
++ */
++struct asm_mem_mapping_hdr {
++	u32 data_payload_addr_lsw;
++	u32 data_payload_addr_msw;
++	u32 mem_map_handle;
++} __packed;
++
++struct asm_stream_cmd_set_pp_params {
++	struct asm_mem_mapping_hdr mem_hdr;
++	u32 payload_size;
++	u8 param_data[];
++} __packed;
++
++/* param_hdr_v1: no instance ID (ASM_STREAM_CMD_SET_PP_PARAMS_V2) */
++struct asm_param_hdr_v1 {
++	u32 module_id;
++	u32 param_id;
++	u16 param_size;
++	u16 reserved;
++} __packed;
++
++/* param_hdr_v3: with instance ID (ASM_STREAM_CMD_SET_PP_PARAMS_V3) */
++struct asm_param_hdr_v3 {
++	u32 module_id;
++	u16 instance_id;
++	u16 reserved;
++	u32 param_id;
++	u32 param_size;
++} __packed;
++
++/* Payload of ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN: linear gain in Q13 */
++struct asm_volume_ctrl_master_gain {
++	u16 master_gain;
++	u16 reserved;
++} __packed;
++
+ struct audio_buffer {
+ 	phys_addr_t phys;
+ 	uint32_t size;		/* size of buffer */
+@@ -641,6 +704,8 @@ static int32_t q6asm_stream_callback(struct apr_device *adev,
+ 		case ASM_STREAM_CMD_OPEN_READ_V3:
+ 		case ASM_STREAM_CMD_OPEN_READWRITE_V2:
+ 		case ASM_STREAM_CMD_SET_ENCDEC_PARAM:
++		case ASM_STREAM_CMD_SET_PP_PARAMS_V2:
++		case ASM_STREAM_CMD_SET_PP_PARAMS_V3:
+ 		case ASM_DATA_CMD_MEDIA_FMT_UPDATE_V2:
+ 		case ASM_DATA_CMD_REMOVE_INITIAL_SILENCE:
+ 		case ASM_DATA_CMD_REMOVE_TRAILING_SILENCE:
+@@ -913,6 +978,91 @@ err:
+ 	return rc;
+ }
+ 
++/**
++ * q6asm_set_volume() - set the ASM stream (soft volume) gain
++ *
++ * @ac: audio client pointer
++ * @q13_gain: linear gain in Q13 (0x2000 == 1.0 == 0 dB)
++ *
++ * Programs the ASM "Volume Control" post-processing module
++ * (ASM_MODULE_ID_VOL_CTRL / ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN, i.e.
++ * SOFT_VOLUME_INSTANCE_1) of the given session.  This is the ASM *stream*
++ * gain stage that mainline never sets; the ADM COPP master gain can only
++ * attenuate, so this is where the playback loudness headroom comes from.
++ *
++ * Return: Will be an negative on error or a zero on success.
++ */
++int q6asm_set_volume(struct audio_client *ac, uint16_t q13_gain)
++{
++	struct asm_stream_cmd_set_pp_params *set;
++	struct asm_volume_ctrl_master_gain vol;
++	struct apr_pkt *pkt;
++	bool instance_id;
++	u32 param_size;
++	int pkt_size, rc;
++	void *p;
++
++	if (!ac)
++		return -EINVAL;
++
++	/*
++	 * Use the instance-ID capable V3 command unless the ASM service
++	 * reports an API version that predates instance IDs.
++	 */
++	instance_id = !(ac->q6asm->ainfo.api_version &&
++			ac->q6asm->ainfo.api_version <
++				ASM_API_VERSION_INSTANCE_ID);
++
++	param_size = (instance_id ? sizeof(struct asm_param_hdr_v3) :
++				    sizeof(struct asm_param_hdr_v1)) +
++		     sizeof(vol);
++	pkt_size = APR_HDR_SIZE + sizeof(*set) + param_size;
++
++	p = kzalloc(pkt_size, GFP_KERNEL);
++	if (!p)
++		return -ENOMEM;
++
++	pkt = p;
++	set = p + APR_HDR_SIZE;
++
++	q6asm_add_hdr(ac, &pkt->hdr, pkt_size, true,
++		      ASM_PLAYBACK_STREAM_ID);
++	pkt->hdr.opcode = instance_id ? ASM_STREAM_CMD_SET_PP_PARAMS_V3 :
++					ASM_STREAM_CMD_SET_PP_PARAMS_V2;
++
++	vol.master_gain = q13_gain;
++	vol.reserved = 0;
++
++	/* mem_hdr stays zeroed: the parameter data is in-band */
++	set->payload_size = param_size;
++
++	if (instance_id) {
++		struct asm_param_hdr_v3 *h = (void *)set->param_data;
++
++		h->module_id = ASM_MODULE_ID_VOL_CTRL;
++		h->instance_id = ASM_INSTANCE_ID_0;
++		h->param_id = ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN;
++		h->param_size = sizeof(vol);
++		memcpy(set->param_data + sizeof(*h), &vol, sizeof(vol));
++	} else {
++		struct asm_param_hdr_v1 *h = (void *)set->param_data;
++
++		h->module_id = ASM_MODULE_ID_VOL_CTRL;
++		h->param_id = ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN;
++		h->param_size = sizeof(vol);
++		memcpy(set->param_data + sizeof(*h), &vol, sizeof(vol));
++	}
++
++	rc = q6asm_ac_send_cmd_sync(ac, pkt);
++	if (rc)
++		dev_err(ac->dev, "Failed to set ASM volume 0x%x, err %d\n",
++			q13_gain, rc);
++
++	kfree(pkt);
++	return rc;
++}
++EXPORT_SYMBOL_GPL(q6asm_set_volume);
++
+ /**
+  * q6asm_open_write() - Open audio client for writing
+  * @ac: audio client pointer
+diff --git a/sound/soc/qcom/qdsp6/q6asm.h b/sound/soc/qcom/qdsp6/q6asm.h
+index 519e1b3..f464b06 100644
+--- a/sound/soc/qcom/qdsp6/q6asm.h
++++ b/sound/soc/qcom/qdsp6/q6asm.h
+@@ -143,6 +143,7 @@ int q6asm_stream_remove_trailing_silence(struct audio_client *ac,
+ int q6asm_cmd(struct audio_client *ac, uint32_t stream_id,  int cmd);
+ int q6asm_cmd_nowait(struct audio_client *ac, uint32_t stream_id,  int cmd);
+ int q6asm_get_session_id(struct audio_client *c);
++int q6asm_set_volume(struct audio_client *ac, uint16_t q13_gain);
+ int q6asm_map_memory_regions(unsigned int dir,
+ 			     struct audio_client *ac,
+ 			     phys_addr_t phys,
+diff --git a/sound/soc/qcom/qdsp6/q6routing.c b/sound/soc/qcom/qdsp6/q6routing.c
+index 12c9ff8..dc72b19 100644
+--- a/sound/soc/qcom/qdsp6/q6routing.c
++++ b/sound/soc/qcom/qdsp6/q6routing.c
+@@ -26,6 +26,14 @@
+ 
+ #define DRV_NAME "q6routing-component"
+ 
++/*
++ * The "MultiMedia1 Playback Volume" kcontrol exposes a linear Q27 gain
++ * (0x08000000 == 1.0 == 0 dB), which is what q6adm_set_volume() takes.  The
++ * ASM stream gain uses the same volume-control module but takes the value
++ * directly in Q13, so convert with a right shift of 27 - 13.
++ */
++#define Q6ROUTING_Q27_TO_Q13_SHIFT	14
++
+ #define Q6ROUTING_RX_MIXERS(id)						\
+ 	SOC_SINGLE_EXT("MultiMedia1", id,				\
+ 	MSM_FRONTEND_DAI_MULTIMEDIA1, 1, 0, msm_routing_get_audio_mixer,\
+@@ -336,6 +344,8 @@ struct session_data {
+ 	int numcopps;
+ 	int fedai_id;
+ 	int volume;	/* COPP master gain, Q27 (0x08000000 == 0 dB) */
++	/* ASM client owning this session; used for the stream gain */
++	struct audio_client *asm_client;
+ 	unsigned long copp_map;
+ 	struct q6copp *copps[MAX_COPPS_PER_PORT];
+ };
+@@ -356,11 +366,13 @@ static struct msm_routing_data *routing_data;
+  * @perf_mode: Performance mode.
+  * @stream_id: ASM stream id to map.
+  * @stream_type: Direction of stream
++ * @ac: ASM audio client owning the stream (for the ASM stream gain).
+  *
+  * Return: Will be an negative on error or a zero on success.
+  */
+ int q6routing_stream_open(int fedai_id, int perf_mode,
+-			   int stream_id, int stream_type)
++			   int stream_id, int stream_type,
++			   struct audio_client *ac)
+ {
+ 	int j, topology, num_copps = 0;
+ 	struct route_payload payload;
+@@ -384,6 +396,7 @@ int q6routing_stream_open(int fedai_id, int perf_mode,
+ 
+ 	mutex_lock(&routing_data->lock);
+ 	session->fedai_id = fedai_id;
++	session->asm_client = ac;
+ 
+ 	session->path_type = pdata->path_type;
+ 	session->sample_rate = pdata->sample_rate;
+@@ -423,12 +436,17 @@ int q6routing_stream_open(int fedai_id, int perf_mode,
+ 		 * apply it now that the COPPs exist.  0 dB is the DSP/ACDB
+ 		 * default, so there is no need to program it explicitly.
+ 		 */
+-		if (session->volume != Q6ADM_VOLUME_MAX_Q27)
++		if (session->volume != Q6ADM_VOLUME_MAX_Q27) {
+ 			for_each_set_bit(j, &session->copp_map,
+ 					 MAX_COPPS_PER_PORT)
+ 				q6adm_set_volume(routing_data->dev,
+ 						 session->port_id, j,
+ 						 session->volume);
++			if (session->asm_client)
++				q6asm_set_volume(session->asm_client,
++						 session->volume >>
++						 Q6ROUTING_Q27_TO_Q13_SHIFT);
++		}
+ 	}
+ 	mutex_unlock(&routing_data->lock);
+ 
+@@ -465,6 +483,17 @@ void q6routing_stream_close(int fedai_id, int stream_type)
+ 	if (!session)
+ 		return;
+ 
++	/*
++	 * Clearing asm_client under the routing lock serialises it against
++	 * msm_routing_put_copp_volume(): a concurrent volume write either sees
++	 * a valid client (and the caller keeps it alive until this function
++	 * returns) or no client at all.  q6asm-dai now calls this before
++	 * q6asm_audio_client_free().
++	 */
++	mutex_lock(&routing_data->lock);
++	session->asm_client = NULL;
++	mutex_unlock(&routing_data->lock);
++
+ 	for_each_set_bit(idx, &session->copp_map, MAX_COPPS_PER_PORT) {
+ 		if (session->copps[idx]) {
+ 			q6adm_close(routing_data->dev, session->copps[idx]);
+@@ -577,6 +606,15 @@ static int msm_routing_put_copp_volume(struct snd_kcontrol *kcontrol,
+ 			break;
+ 	}
+ 
++	/*
++	 * Drive the ASM stream gain with the same value, so the userspace
++	 * volume controls both stages.  (The ADM COPP gain can only
++	 * attenuate; the ASM stream volume is where the extra headroom is.)
++	 */
++	if (!ret && session->asm_client)
++		ret = q6asm_set_volume(session->asm_client,
++				       volume >> Q6ROUTING_Q27_TO_Q13_SHIFT);
++
+ 	if (!ret)
+ 		session->volume = volume;
+ 	mutex_unlock(&priv->lock);
+diff --git a/sound/soc/qcom/qdsp6/q6routing.h b/sound/soc/qcom/qdsp6/q6routing.h
+index 35514e6..ac5c3fb 100644
+--- a/sound/soc/qcom/qdsp6/q6routing.h
++++ b/sound/soc/qcom/qdsp6/q6routing.h
+@@ -2,8 +2,11 @@
+ #ifndef _Q6_PCM_ROUTING_H
+ #define _Q6_PCM_ROUTING_H
+ 
++struct audio_client;
++
+ int q6routing_stream_open(int fedai_id, int perf_mode,
+-			   int stream_id, int stream_type);
++			   int stream_id, int stream_type,
++			   struct audio_client *ac);
+ void q6routing_stream_close(int fedai_id, int stream_type);
+ 
+ #endif /*_Q6_PCM_ROUTING_H */

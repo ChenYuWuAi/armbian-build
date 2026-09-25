@@ -1,0 +1,374 @@
+diff --git a/sound/soc/qcom/qdsp6/q6adm.c b/sound/soc/qcom/qdsp6/q6adm.c
+index 1530e98..89e7d03 100644
+--- a/sound/soc/qcom/qdsp6/q6adm.c
++++ b/sound/soc/qcom/qdsp6/q6adm.c
+@@ -25,6 +25,31 @@
+ #define ADM_CMDRSP_DEVICE_OPEN_V5	0x00010329
+ #define ADM_CMD_DEVICE_CLOSE_V5		0x00010327
+ #define ADM_CMD_MATRIX_MAP_ROUTINGS_V5	0x00010325
++#define ADM_CMD_SET_PP_PARAMS_V5	0x00010328
++#define ADM_CMD_SET_PP_PARAMS_V6	0x0001035D
++
++/* ADSP ADM service API version that introduced instance IDs (param_hdr_v3) */
++#define ADM_API_VERSION_INSTANCE_ID	3
++
++/*
++ * Post-processing module/parameter IDs of the ADSP "Volume Control" module.
++ * Taken verbatim from the downstream Qualcomm techpack:
++ *   techpack/audio/include/dsp/apr_audio-v2.h
++ *     #define ASM_MODULE_ID_VOL_CTRL            0x00010BFE
++ *     #define AUDPROC_MODULE_ID_VOL_CTRL ASM_MODULE_ID_VOL_CTRL
++ *     #define ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN 0x00010BFF
++ *     #define AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN \
++ *                                     ASM_PARAM_ID_VOL_CTRL_MASTER_GAIN
++ *     #define INSTANCE_ID_0                     0x0000
++ */
++#define AUDPROC_MODULE_ID_VOL_CTRL		0x00010BFE
++#define AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN	0x00010BFF
++#define ADM_INSTANCE_ID_0			0x0000
++
++/* 1.0 (0 dB) in Q13, the format the ADSP volume module expects on the wire */
++#define Q6ADM_VOLUME_0DB_Q13			0x2000
++/* right shift that converts Q27 -> Q13 (27 - 13) */
++#define Q6ADM_Q27_TO_Q13_SHIFT			14
+ 
+ #define TIMEOUT_MS 1000
+ #define RESET_COPP_ID 99
+@@ -87,6 +112,63 @@ struct q6adm_session_map_node_v5 {
+ 	u16 num_copps;
+ } __packed;
+ 
++/*
++ * In-band "set post-processing parameters" command, as defined by the
++ * downstream techpack (techpack/audio/include/dsp/apr_audio-v2.h):
++ *
++ *   struct adm_cmd_set_pp_params {
++ *           struct apr_hdr apr_hdr;
++ *           struct mem_mapping_hdr mem_hdr;
++ *           u32 payload_size;
++ *           u8 param_data[0];
++ *   } __packed;
++ *
++ * The in-band case leaves mem_hdr zeroed and puts the packed parameter
++ * header (param_hdr_v1 or param_hdr_v3) followed by the parameter payload
++ * right after payload_size.
++ */
++struct q6adm_mem_mapping_hdr {
++	u32 data_payload_addr_lsw;
++	u32 data_payload_addr_msw;
++	u32 mem_map_handle;
++} __packed;
++
++struct q6adm_cmd_set_pp_params {
++	struct apr_hdr hdr;
++	struct q6adm_mem_mapping_hdr mem_hdr;
++	u32 payload_size;
++	u8 param_data[];
++} __packed;
++
++/* param_hdr_v1: no instance ID (used with ADM_CMD_SET_PP_PARAMS_V5) */
++struct q6adm_param_hdr_v1 {
++	u32 module_id;
++	u32 param_id;
++	u16 param_size;
++	u16 reserved;
++} __packed;
++
++/* param_hdr_v3: with instance ID (used with ADM_CMD_SET_PP_PARAMS_V6) */
++struct q6adm_param_hdr_v3 {
++	u32 module_id;
++	u16 instance_id;
++	u16 reserved;
++	u32 param_id;
++	u32 param_size;
++} __packed;
++
++/*
++ * Payload of AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN.  Despite the "Q27"
++ * naming of the userspace control, the ADSP's volume-control module takes a
++ * *linear Q13* gain (0x2000 == 1.0 == 0 dB); the mainline AudioReach driver
++ * uses the very same layout and default (VOL_CTRL_DEFAULT_GAIN 0x2000).
++ * See NOTES.md for the evidence and for the Q27 -> Q13 conversion.
++ */
++struct q6adm_audproc_volume_ctrl_master_gain {
++	u16 master_gain;
++	u16 reserved;
++} __packed;
++
+ static struct q6copp *q6adm_find_copp(struct q6adm *adm, int port_idx,
+ 				  int copp_idx)
+ {
+@@ -155,6 +237,8 @@ static int q6adm_callback(struct apr_device *adev, struct apr_resp_pkt *data)
+ 		switch (result->opcode) {
+ 		case ADM_CMD_DEVICE_OPEN_V5:
+ 		case ADM_CMD_DEVICE_CLOSE_V5:
++		case ADM_CMD_SET_PP_PARAMS_V5:
++		case ADM_CMD_SET_PP_PARAMS_V6:
+ 			copp = q6adm_find_copp(adm, port_idx, copp_idx);
+ 			if (!copp)
+ 				return 0;
+@@ -446,6 +530,119 @@ int q6adm_get_copp_id(struct q6copp *copp)
+ }
+ EXPORT_SYMBOL_GPL(q6adm_get_copp_id);
+ 
++/**
++ * q6adm_set_volume() - set the master gain of an ADM COPP
++ *
++ * @dev: Pointer to adm child device.
++ * @port_id: AFE port index (the same value used for q6adm_open()).
++ * @copp_idx: copp index of the ADM copp.
++ * @volume: linear gain in Q27 (0x08000000 == 1.0 == 0 dB).
++ *
++ * Programs the "Volume Control" post-processing module of the given COPP
++ * with AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN.  The ADSP expects a linear
++ * Q13 gain, so the Q27 value is converted before it is put on the wire.
++ *
++ * Return: Will be an negative on error or a zero on success.
++ */
++int q6adm_set_volume(struct device *dev, int port_id, int copp_idx, int volume)
++{
++	struct q6adm *adm = dev_get_drvdata(dev->parent);
++	struct q6adm_cmd_set_pp_params *set;
++	struct q6adm_audproc_volume_ctrl_master_gain vol;
++	struct q6copp *copp;
++	int afe_port, pkt_size, ret;
++	u32 param_size, opcode;
++
++	if (port_id < 0 || port_id >= AFE_MAX_PORTS) {
++		dev_err(dev, "Invalid port_id %d\n", port_id);
++		return -EINVAL;
++	}
++
++	if (copp_idx < 0 || copp_idx >= MAX_COPPS_PER_PORT) {
++		dev_err(dev, "Invalid copp_idx %d\n", copp_idx);
++		return -EINVAL;
++	}
++
++	volume = clamp_t(int, volume, 0, Q6ADM_VOLUME_MAX_Q27);
++
++	copp = q6adm_find_copp(adm, port_id, copp_idx);
++	if (!copp) {
++		dev_err(dev, "No copp for port %d idx %d\n", port_id, copp_idx);
++		return -EINVAL;
++	}
++
++	afe_port = q6afe_get_port_id(port_id);
++	if (afe_port < 0) {
++		ret = -EINVAL;
++		goto err_put_copp;
++	}
++
++	/*
++	 * sm8250 (ADM API v3) understands the V6 command with a param_hdr_v3
++	 * carrying an instance ID.  Only fall back to V5/param_hdr_v1 for
++	 * ADSP firmware that reports a known older API version.
++	 */
++	if (adm->ainfo.api_version && adm->ainfo.api_version <
++	    ADM_API_VERSION_INSTANCE_ID) {
++		opcode = ADM_CMD_SET_PP_PARAMS_V5;
++		param_size = sizeof(struct q6adm_param_hdr_v1) +
++			     sizeof(vol);
++	} else {
++		opcode = ADM_CMD_SET_PP_PARAMS_V6;
++		param_size = sizeof(struct q6adm_param_hdr_v3) +
++			     sizeof(vol);
++	}
++
++	pkt_size = sizeof(*set) + param_size;
++	set = kzalloc(pkt_size, GFP_KERNEL);
++	if (!set) {
++		ret = -ENOMEM;
++		goto err_put_copp;
++	}
++
++	set->hdr.hdr_field = APR_HDR_FIELD(APR_MSG_TYPE_SEQ_CMD,
++					   APR_HDR_LEN(APR_HDR_SIZE),
++					   APR_PKT_VER);
++	set->hdr.pkt_size = pkt_size;
++	set->hdr.src_port = afe_port;
++	set->hdr.dest_port = copp->id;
++	set->hdr.token = port_id << 16 | copp_idx;
++	set->hdr.opcode = opcode;
++	set->payload_size = param_size;
++	/* mem_hdr stays zeroed: parameter data is in-band */
++
++	vol.master_gain = volume >> Q6ADM_Q27_TO_Q13_SHIFT;
++	vol.reserved = 0;
++
++	if (opcode == ADM_CMD_SET_PP_PARAMS_V6) {
++		struct q6adm_param_hdr_v3 *hdr = (void *)set->param_data;
++
++		hdr->module_id = AUDPROC_MODULE_ID_VOL_CTRL;
++		hdr->instance_id = ADM_INSTANCE_ID_0;
++		hdr->param_id = AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN;
++		hdr->param_size = sizeof(vol);
++		memcpy(set->param_data + sizeof(*hdr), &vol, sizeof(vol));
++	} else {
++		struct q6adm_param_hdr_v1 *hdr = (void *)set->param_data;
++
++		hdr->module_id = AUDPROC_MODULE_ID_VOL_CTRL;
++		hdr->param_id = AUDPROC_PARAM_ID_VOL_CTRL_MASTER_GAIN;
++		hdr->param_size = sizeof(vol);
++		memcpy(set->param_data + sizeof(*hdr), &vol, sizeof(vol));
++	}
++
++	ret = q6adm_apr_send_copp_pkt(adm, copp, (struct apr_pkt *)set, 0);
++	if (ret)
++		dev_err(dev, "Failed to set copp volume, err %d\n", ret);
++
++	kfree(set);
++err_put_copp:
++	kref_put(&copp->refcount, q6adm_free_copp);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(q6adm_set_volume);
++
+ /**
+  * q6adm_matrix_map() - Map asm streams and afe ports using payload
+  *
+diff --git a/sound/soc/qcom/qdsp6/q6adm.h b/sound/soc/qcom/qdsp6/q6adm.h
+index 4f56999..3b32d92 100644
+--- a/sound/soc/qcom/qdsp6/q6adm.h
++++ b/sound/soc/qcom/qdsp6/q6adm.h
+@@ -7,6 +7,13 @@
+ #define MAX_COPPS_PER_PORT	8
+ #define NULL_COPP_TOPOLOGY	0x00010312
+ 
++/*
++ * COPP master gain is expressed as a linear Q27 value, 1.0 (0 dB) being
++ * 0x08000000.  q6adm_set_volume() converts it to the Q13 format that the
++ * ADSP volume control module expects.
++ */
++#define Q6ADM_VOLUME_MAX_Q27	0x08000000
++
+ /* multiple copp per stream. */
+ struct route_payload {
+ 	int num_copps;
+@@ -21,6 +28,8 @@ struct q6copp *q6adm_open(struct device *dev, int port_id, int path, int rate,
+ 			   uint16_t bit_width, int app_type, int acdb_id);
+ int q6adm_close(struct device *dev, struct q6copp *copp);
+ int q6adm_get_copp_id(struct q6copp *copp);
++int q6adm_set_volume(struct device *dev, int port_id, int copp_idx,
++		     int volume);
+ int q6adm_matrix_map(struct device *dev, int path,
+ 		     struct route_payload payload_map, int perf_mode);
+ 
+diff --git a/sound/soc/qcom/qdsp6/q6routing.c b/sound/soc/qcom/qdsp6/q6routing.c
+index 9022869..12c9ff8 100644
+--- a/sound/soc/qcom/qdsp6/q6routing.c
++++ b/sound/soc/qcom/qdsp6/q6routing.c
+@@ -335,6 +335,7 @@ struct session_data {
+ 	int perf_mode;
+ 	int numcopps;
+ 	int fedai_id;
++	int volume;	/* COPP master gain, Q27 (0x08000000 == 0 dB) */
+ 	unsigned long copp_map;
+ 	struct q6copp *copps[MAX_COPPS_PER_PORT];
+ };
+@@ -416,6 +417,18 @@ int q6routing_stream_open(int fedai_id, int perf_mode,
+ 		payload.session_id = stream_id;
+ 		q6adm_matrix_map(routing_data->dev, session->path_type,
+ 				 payload, perf_mode);
++
++		/*
++		 * A gain set before the stream was started is only cached;
++		 * apply it now that the COPPs exist.  0 dB is the DSP/ACDB
++		 * default, so there is no need to program it explicitly.
++		 */
++		if (session->volume != Q6ADM_VOLUME_MAX_Q27)
++			for_each_set_bit(j, &session->copp_map,
++					 MAX_COPPS_PER_PORT)
++				q6adm_set_volume(routing_data->dev,
++						 session->port_id, j,
++						 session->volume);
+ 	}
+ 	mutex_unlock(&routing_data->lock);
+ 
+@@ -515,6 +528,69 @@ static int msm_routing_put_audio_mixer(struct snd_kcontrol *kcontrol,
+ 	return 1;
+ }
+ 
++/*
++ * COPP master gain control.
++ *
++ * Userspace passes a linear Q27 value (0x08000000 == 1.0 == 0 dB), which is
++ * forwarded to q6adm_set_volume() for every COPP currently mapped to the
++ * session.  The value is cached in the session so a COPP that is opened
++ * later (or re-opened) can be programmed when the stream starts.
++ */
++static int msm_routing_get_copp_volume(struct snd_kcontrol *kcontrol,
++				       struct snd_ctl_elem_value *ucontrol)
++{
++	struct snd_soc_component *c = snd_soc_kcontrol_component(kcontrol);
++	struct msm_routing_data *priv = dev_get_drvdata(c->dev);
++	struct soc_mixer_control *mc =
++		(struct soc_mixer_control *)kcontrol->private_value;
++	int session_id = mc->shift;
++
++	if (session_id < 0 || session_id >= MAX_SESSIONS)
++		return -EINVAL;
++
++	ucontrol->value.integer.value[0] = priv->sessions[session_id].volume;
++
++	return 0;
++}
++
++static int msm_routing_put_copp_volume(struct snd_kcontrol *kcontrol,
++				       struct snd_ctl_elem_value *ucontrol)
++{
++	struct snd_soc_component *c = snd_soc_kcontrol_component(kcontrol);
++	struct msm_routing_data *priv = dev_get_drvdata(c->dev);
++	struct soc_mixer_control *mc =
++		(struct soc_mixer_control *)kcontrol->private_value;
++	struct session_data *session = &priv->sessions[mc->shift];
++	unsigned long copp_map;
++	int copp_idx, ret = 0;
++	int volume;
++
++	volume = clamp_t(int, ucontrol->value.integer.value[0],
++			 0, Q6ADM_VOLUME_MAX_Q27);
++
++	mutex_lock(&priv->lock);
++	copp_map = session->copp_map;
++	for_each_set_bit(copp_idx, &copp_map, MAX_COPPS_PER_PORT) {
++		ret = q6adm_set_volume(priv->dev, session->port_id, copp_idx,
++				       volume);
++		if (ret)
++			break;
++	}
++
++	if (!ret)
++		session->volume = volume;
++	mutex_unlock(&priv->lock);
++
++	return ret ? ret : 1;
++}
++
++static const struct snd_kcontrol_new msm_soc_routing_controls[] = {
++	SOC_SINGLE_EXT("MultiMedia1 Playback Volume", SND_SOC_NOPM,
++		       0, Q6ADM_VOLUME_MAX_Q27, 0,
++		       msm_routing_get_copp_volume,
++		       msm_routing_put_copp_volume),
++};
++
+ static const struct snd_kcontrol_new hdmi_mixer_controls[] = {
+ 	Q6ROUTING_RX_MIXERS(HDMI_RX) };
+ 
+@@ -1093,6 +1169,7 @@ static int msm_routing_probe(struct snd_soc_component *c)
+ 	for (i = 0; i < MAX_SESSIONS; i++) {
+ 		routing_data->sessions[i].port_id = -1;
+ 		routing_data->sessions[i].fedai_id = -1;
++		routing_data->sessions[i].volume = Q6ADM_VOLUME_MAX_Q27;
+ 	}
+ 
+ 	return 0;
+@@ -1115,6 +1192,8 @@ static int q6routing_reg_write(struct snd_soc_component *component,
+ static const struct snd_soc_component_driver msm_soc_routing_component = {
+ 	.probe = msm_routing_probe,
+ 	.name = DRV_NAME,
++	.controls = msm_soc_routing_controls,
++	.num_controls = ARRAY_SIZE(msm_soc_routing_controls),
+ 	.hw_params = routing_hw_params,
+ 	.dapm_widgets = msm_qdsp6_widgets,
+ 	.num_dapm_widgets = ARRAY_SIZE(msm_qdsp6_widgets),
