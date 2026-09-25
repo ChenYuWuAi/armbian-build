@@ -1,0 +1,11 @@
+[Unit]
+Description=elish: stop SLPI to end its sensor-PD crash loop (audio does not use it)
+After=basic.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/slpi-off.sh
+
+[Install]
+WantedBy=multi-user.target

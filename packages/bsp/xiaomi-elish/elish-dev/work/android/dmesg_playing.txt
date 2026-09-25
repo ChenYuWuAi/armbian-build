@@ -1,0 +1,109 @@
+[  755.408348] cs35l41 1-0040: cs35l41_pcm_startup
+[  755.408351] cs35l41 1-0040: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408357] cs35l41 1-0041: cs35l41_pcm_startup
+[  755.408358] cs35l41 1-0041: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408361] cs35l41 1-0043: cs35l41_pcm_startup
+[  755.408362] cs35l41 1-0043: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408365] cs35l41 1-0042: cs35l41_pcm_startup
+[  755.408366] cs35l41 1-0042: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408369] cs35l41 2-0040: cs35l41_pcm_startup
+[  755.408369] cs35l41 2-0040: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408372] cs35l41 2-0041: cs35l41_pcm_startup
+[  755.408373] cs35l41 2-0041: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408376] cs35l41 2-0043: cs35l41_pcm_startup
+[  755.408377] cs35l41 2-0043: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.408379] cs35l41 2-0042: cs35l41_pcm_startup
+[  755.408380] cs35l41 2-0042: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.409415] q6asm_callback: cmd = 0x10bcd returned error = 0x1
+[  755.409704] __q6asm_cmd: DSP returned error[ADSP_EFAILED] opcode 68557
+[  755.410505] cs35l41 1-0040: cs35l41_pcm_startup
+[  755.410506] cs35l41 1-0040: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410511] cs35l41 1-0041: cs35l41_pcm_startup
+[  755.410512] cs35l41 1-0041: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410515] cs35l41 1-0043: cs35l41_pcm_startup
+[  755.410516] cs35l41 1-0043: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410518] cs35l41 1-0042: cs35l41_pcm_startup
+[  755.410519] cs35l41 1-0042: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410521] cs35l41 2-0040: cs35l41_pcm_startup
+[  755.410522] cs35l41 2-0040: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410524] cs35l41 2-0041: cs35l41_pcm_startup
+[  755.410525] cs35l41 2-0041: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410527] cs35l41 2-0043: cs35l41_pcm_startup
+[  755.410528] cs35l41 2-0043: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410530] cs35l41 2-0042: cs35l41_pcm_startup
+[  755.410531] cs35l41 2-0042: cs35l41_set_dai_fmt: fmt = 0x4004
+[  755.410723] msm_be_hw_params_fixup: dai_id= 87, format = 2, rate = 48000
+[  755.410725] kona_tdm_snd_hw_params: dai id = 0x9020
+[  755.410726] kona_tdm_snd_hw_params: path dir: 0, interface 2, channel interface 0
+[  755.410727] kona_tdm_snd_hw_params: tdm rx slot_width 32 slots 8 slot_mask ff
+[  755.410728] kona_tdm_snd_hw_params: tdm rx channels: 2
+[  755.410731] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410733] cs35l41 1-0040: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410737] cs35l41 1-0040: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410738] cs35l41 1-0040: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410740] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410741] cs35l41 1-0041: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410742] cs35l41 1-0041: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410743] cs35l41 1-0041: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410745] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410745] cs35l41 1-0043: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410747] cs35l41 1-0043: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410748] cs35l41 1-0043: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410750] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410750] cs35l41 1-0042: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410752] cs35l41 1-0042: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410753] cs35l41 1-0042: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410754] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410755] cs35l41 2-0040: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410757] cs35l41 2-0040: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410758] cs35l41 2-0040: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410760] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410760] cs35l41 2-0041: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410762] cs35l41 2-0041: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410763] cs35l41 2-0041: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410764] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410765] cs35l41 2-0043: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410767] cs35l41 2-0043: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410768] cs35l41 2-0043: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410769] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.410770] cs35l41 2-0042: cs35l41_pcm_hw_params: rate = 48000, asp_wl = 24, asp_width = 32
+[  755.410772] cs35l41 2-0042: cs35l41_component_set_sysclk: clk_id = 0, source = 0, freq = 12288000, dir = 0
+[  755.410772] cs35l41 2-0042: cs35l41_component_set_sysclk: Ignore duplicate PLL setting
+[  755.410774] msm_be_hw_params_fixup: dai_id= 87, format = 6, rate = 48000
+[  755.413292] afe_get_cal_topology_id: cal_type 8 not initialized for this port 36896
+[  755.413298] afe_send_port_topology_id: AFE set topology id 0x0  enable for port 0x9020 ret -22
+[  755.413299] send_afe_cal_type: cal_index is 0
+[  755.413300] send_afe_cal_type: dev_acdb_id[87] is 10011
+[  755.413301] afe_find_cal: cal_index 0 port_id 0x9020 port_index 87
+[  755.413302] afe_find_cal: acdb_id 10011 dev_acdb_id 10011 sample_rate 48000 afe_sample_rates 48000
+[  755.413303] afe_find_cal: cal block is a match, size is 0
+[  755.413303] send_afe_cal_type cal_block not found!!
+[  755.413505] afe_send_hw_delay: port_id 0x9020 rate 48000 delay_usec 0 status 0
+[  755.421521] q6asm_get_asm_topology_apptype: popp using topology 0x10be4 app_type 69936
+[  755.424758] adm_open:port 0x9020 path:1 rate:48000 channel_mode:2 perf_mode:0 topology 0x1000a100 bit_width 24 \x09\x09app_type 69940 acdb_id 10011 session_type 0 passthr_mode 0 
+[  755.537468] binder: 9054:9054 ioctl 40046210 7ff61c7780 returned -22
+[  755.550702] binder: 9054:9054 ioctl 40046210 7ff61c7964 returned -22
+[  756.416572] init: Untracked pid 9052 exited with status 0
+[  756.416613] init: Untracked pid 9052 did not have an associated service entry and will not be reaped
+[  756.682426] QCOM-STEPCHG: handle_jeita: BATT_TEMP = 299 FCC = 12400000uA FV = 4500000uV BATT_TEMP = 299 max voltage= 4500000uv battery warm = 480 battery cool = 150
+[  756.697404] QCOM-STEPCHG: handle_step_chg_config: OCV = 3921000 Step-FCC = 12400000uA taper-fcc: 0
+[  756.711453] QCOM-STEPCHG: handle_step_chg_config: bms step charge fcc:9283000 fv:4450000
+[  756.799229] healthd: battery l=49 v=3921 t=29.9 h=2 st=2 c=-419 tl=0 ct=USB chg=u
+[  756.799454] healthd: battery l=49 v=3921 t=29.9 h=2 st=2 c=-419 tl=0 ct=USB chg=u
+[  756.819245] healthd: battery l=49 v=3920 t=29.9 h=2 st=2 c=-446 tl=0 ct=USB chg=u
+[  756.962369] cnss: Runtime resume start
+[  756.962441] cnss: Resuming PCI link
+[  756.963972] cnss: Set PCI link status to: 2
+[  756.964003] cnss: Setting MHI state: RESUME(7)
+[  756.968820] [kworke][0x36798cc49][01:39:44.260622] wlan: [358:I:PMO] pmo_core_psoc_send_host_wakeup_ind_to_fw: 1225: Host wakeup indication sent to fw
+[  756.985038] cnss: Runtime resume status: 0
+[  757.058415] healthd: battery l=49 v=3920 t=29.9 h=2 st=2 c=-446 tl=0 ct=USB chg=u
+[  757.058634] healthd: battery l=49 v=3920 t=29.9 h=2 st=2 c=-446 tl=0 ct=USB chg=u
+[  757.077471] healthd: battery l=49 v=3920 t=29.9 h=2 st=2 c=-446 tl=0 ct=USB chg=u
+[  757.088338] msm_dwc3_perf_vote_work: in_perf_mode:1, interrupts in last sample:18446744073709544974
+[  757.249697] msm_dwc3_perf_vote_work: in_perf_mode:1, interrupts in last sample:6647
+[  757.390339] [oem][alarm]: type=1, func=timerfd_alarmproc
+[  757.391450] Alarmtimer { hvdcp_opti', '787391'}
+[  757.391466] alarmtimer_enqueue: comm:hvdcp_opti pid:1924 exp:787391 func:timerfd_alarmproc
+[  758.525865] [dual-fuelgauge] fg_update_status: SOC:49,Volt:3921,Cur:-426,Temp:299,RM:3542,FC:7261,FAST:0
+[  758.525907] [dual-fuelgauge] fg_update_charge_full: raw:4878,done:0,full:0,health:1

@@ -1,0 +1,12 @@
+[Unit]
+Description=elish CS35L41 keep amps powered (fix PRE_PMU -110 timing)
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/amp-always-on.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

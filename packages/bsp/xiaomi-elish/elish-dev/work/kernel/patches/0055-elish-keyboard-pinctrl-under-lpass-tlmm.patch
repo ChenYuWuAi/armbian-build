@@ -1,0 +1,11 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
+@@ -738,7 +738,7 @@
+ 	};
+ };
+ 
+-&tlmm {
++&lpass_tlmm {
+ 	keyboard_en_state: keyboard-default-state {
+ 		pins = "gpio9";
+ 		function = "i2s1_data";

@@ -1,0 +1,70 @@
+From: elish reverse-engineering <noreply@localhost>
+Subject: [PATCH] ASoC: cs35l41: do not consume the one-shot PUP/PDN sticky status
+
+On elish (Xiaomi Pad 5 Pro, SM8250 + 8x CS35L41) the PUP_DONE/PDN_DONE bits of
+CS35L41_IRQ1_STATUS1 are ONE-SHOT STICKY flags: once cleared, a later
+GLOBAL_EN 0->1 does NOT latch them again. Upstream clears the flag after every
+successful enable, so every subsequent enable polls for an edge that never
+comes and fails with -110, leaving the amplifiers unpowered.
+
+Measured on the device's own silicon (Android stock boot); Android's vendor
+driver never clears the flag, so its poll is always already satisfied.
+
+---
+--- a/sound/soc/codecs/cs35l41-lib.c
++++ b/sound/soc/codecs/cs35l41-lib.c
+@@ -1266,14 +1266,26 @@
+ 		if (ret || enable)
+ 			return ret;
+ 
++		/* elish: PUP_DONE/PDN_DONE are ONE-SHOT STICKY flags.  Measured on
++		 * this very board's CS35L41 silicon: after the flag has been
++		 * cleared once, a later GLOBAL_EN 0 -> 1 does NOT latch it again,
++		 * so polling for a fresh edge times out forever (-110) even though
++		 * the amplifier is fully powered.  Upstream clears the flag after
++		 * every successful enable, which guarantees that every subsequent
++		 * enable fails.  The Android vendor driver never clears it, so its
++		 * poll is always already satisfied.
++		 *
++		 * Therefore: keep polling (harmless when the flag is still set),
++		 * but treat a timeout as informational and DO NOT clear the flag.
++		 */
+ 		ret = regmap_read_poll_timeout(regmap, CS35L41_IRQ1_STATUS1,
+ 					int_status, int_status & pup_pdn_mask,
+-					1000, 100000);
++					1000, 20000);
+ 		if (ret)
+-			dev_err(dev, "Enable(%d) failed: %d\n", enable, ret);
++			dev_warn(dev, "elish: %s_DONE not latched for this enable (sticky flag already consumed), continuing\n",
++				 enable ? "PUP" : "PDN");
+ 
+-		/* Clear PUP/PDN status */
+-		regmap_write(regmap, CS35L41_IRQ1_STATUS1, pup_pdn_mask);
++		ret = 0;
+ 		break;
+ 	case CS35L41_INT_BOOST:
+ 		ret = regmap_update_bits(regmap, CS35L41_PWR_CTRL1, CS35L41_GLOBAL_EN_MASK,
+@@ -1283,14 +1295,19 @@
+ 			return ret;
+ 		}
+ 
++		/* elish: this is the branch this board actually uses (the
++		 * "Enable(1) failed" message can only originate here).  See the
++		 * sticky-flag note in the SHD_BOOST case above: do not fail on a
++		 * poll timeout and do not consume the one-shot status flag.
++		 */
+ 		ret = regmap_read_poll_timeout(regmap, CS35L41_IRQ1_STATUS1,
+ 					int_status, int_status & pup_pdn_mask,
+-					1000, 100000);
++					1000, 20000);
+ 		if (ret)
+-			dev_err(dev, "Enable(%d) failed: %d\n", enable, ret);
++			dev_warn(dev, "elish: %s_DONE not latched for this enable (sticky flag already consumed), continuing\n",
++				 enable ? "PUP" : "PDN");
+ 
+-		/* Clear PUP/PDN status */
+-		regmap_write(regmap, CS35L41_IRQ1_STATUS1, pup_pdn_mask);
++		ret = 0;
+ 		break;
+ 	case CS35L41_EXT_BOOST:
+ 	case CS35L41_EXT_BOOST_NO_VSPK_SWITCH:

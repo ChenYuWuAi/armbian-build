@@ -1,0 +1,743 @@
+09-22 01:27:14.751  1736  1933 I adsprpcd: vendor/qcom/proprietary/adsprpc/src/apps_std_imp.c:868: Successfully opened file /vendor/etc/acdbdata//adsp_avs_config.acdb
+09-22 01:27:16.578  1051  1119 E platform_info: process_backend_name: Device SND_DEVICE_OUT_VOICE_TTY_VCO_HEADSET not found, no ACDB ID set!
+09-22 01:27:16.578  1051  1119 E platform_info: process_backend_name: Device SND_DEVICE_OUT_ULTRASOUND not found, no ACDB ID set!
+09-22 01:27:16.580  1051  1119 E platform_info: process_backend_name: Device SND_DEVICE_IN_HANDSET_STEREO_DMIC not found, no ACDB ID set!
+09-22 01:27:16.580  1051  1119 E platform_info: process_backend_name: Device SND_DEVICE_IN_SPEAKER_STEREO_DMIC not found, no ACDB ID set!
+09-22 01:27:17.320  1051  1051 D ACDB-LOADER: ACDB: board_type = ELISH
+09-22 01:27:17.320  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/adsp_avs_config.acdb
+09-22 01:27:17.320  1051  1051 D ACDB-LOADER: ACDB -> found 1 form factor & soundcard independant files
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Bluetooth_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_workspaceFile.qwsp
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Speaker_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Headset_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Global_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Hdmi_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_General_cal.acdb
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> Load file: /vendor/etc/acdbdata/Forte/Forte_Handset_cal.acdb
+09-22 01:27:17.321  1051  1051 I ACDB-LOADER: ACDB -> Info: Loaded ForteMedia ACDB!
+09-22 01:27:17.321  1051  1051 D ACDB-LOADER: ACDB -> ACDB_CMD_INITIALIZE_V2
+09-22 01:27:17.321  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/adsp_avs_config.acdb
+09-22 01:27:17.321  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.321  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 0, ACDB File Minor = 0, ACDB File Revision = 0
+09-22 01:27:17.323  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Bluetooth_cal.acdb
+09-22 01:27:17.323  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.323  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.324  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_workspaceFile.qwsp
+09-22 01:27:17.324  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.324  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 0, ACDB File Minor = 0, ACDB File Revision = 0
+09-22 01:27:17.328  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Speaker_cal.acdb
+09-22 01:27:17.328  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.328  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.330  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Headset_cal.acdb
+09-22 01:27:17.330  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.330  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.331  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Global_cal.acdb
+09-22 01:27:17.331  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.331  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.332  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Hdmi_cal.acdb
+09-22 01:27:17.332  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.332  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.333  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_General_cal.acdb
+09-22 01:27:17.333  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.333  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.337  1051  1051 D android.hardware.audio.service: [ACDB Command]->SW Minor/Major/Revision version info for /vendor/etc/acdbdata/Forte/Forte_Handset_cal.acdb
+09-22 01:27:17.337  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB Sw Major = 10, ACDB Sw Minor = 0, ACDB Sw Revision = 17, ACDB Sw Cpl Number = 0
+09-22 01:27:17.337  1051  1051 D android.hardware.audio.service: [ACDB Command]->ACDB File Major = 12, ACDB File Minor = 0, ACDB File Revision = 4, ACDB File Cpl Number = 0
+09-22 01:27:17.337  1051  1051 D ACDB-LOADER: get_acdb_sw_major_version: ACDB SW Major version: 10
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: get_instance_id_support: ACDB file instance ID support info:1
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: acdb_loader_init_v4: snd_card_name:kona-mtp-snd-card, cvd_version:2.4, instance_id_supported:1
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: ACDB -> ACPH INIT
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: ACDB -> RTAC INIT
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: ACDB -> MCS, FTS INIT
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: ACDB -> ADIE RTAC INIT
+09-22 01:27:17.338  1051  1051 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_VOC_PROC_DYNAMIC_TABLE_SIZE
+09-22 01:27:17.350  1051  1051 D ACDB-LOADER: ACDB -> send_common_custom_topology
+09-22 01:27:17.350  1051  1051 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AVCS_CUSTOM_TOPO_INFO_SIZE_V3
+09-22 01:27:17.351  1051  1051 D ACDB-LOADER: Reallocate memory for Custom Topology to size: 5444
+09-22 01:27:17.351  1051  1051 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AVCS_CUSTOM_TOPO_INFO_V3
+09-22 01:27:17.351  1051  1051 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AVCS_CUSTOM_TOPO_INFO_V3: size:0x1544 ret=0 
+09-22 01:27:17.351  1051  1051 D ACDB-LOADER: ACDB -> CORE_CUSTOM_TOPOLOGIES
+09-22 01:27:17.356  1051  1051 D ACDB-LOADER: ACDB -> acdb_loader_send_common_custom_topology: Common custom topology in use
+09-22 01:27:17.356  1051  1051 D ACDB-LOADER: ACDB -> init done!
+09-22 01:27:17.356  1051  1051 D audio_hw_acdb: acdb_init_v2: ACDB Instance ID support after ACDB init:1
+09-22 01:27:17.357  1051  1051 D audio_hw_acdb: check_and_set_instance_id_support: Final Instance ID support:1
+09-22 01:27:21.633  1051  1119 D ACDB-LOADER: ACDB -> already initialized, exit
+09-22 01:27:21.633  1051  1119 D audio_hw_acdb: acdb_init_v2: ACDB Instance ID support after ACDB init:1
+09-22 01:27:21.634  1051  1119 D audio_hw_acdb: check_and_set_instance_id_support: Final Instance ID support:1
+09-22 01:27:21.634  1051  1119 D msm8974_platform: ACDB initialized
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_ANC_SETTING
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: Error: ACDB ANC returned = -19
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: send mbhc data
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> MBHC ACDB_PID_GENERAL_CONFIG
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> MBHC ACDB_PID_PLUG_REMOVAL_DETECTION
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> MBHC ACDB_PID_PLUG_TYPE_DETECTION
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> MBHC ACDB_PID_BUTTON_PRESS_DETECTION
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> MBHC ACDB_PID_IMPEDANCE_DETECTION
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: send vbat data
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> VBAT ACDB_PID_ADC_CAL
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: ACDB -> VBAT ACDB_PID_GAIN_PROC
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: send vbat data, calling convert_vbat_data
+09-22 01:27:21.634  1051  1119 D ACDB-LOADER: copied vbat cal size =72
+09-22 01:27:24.962  2809  2809 V KeyguardUpdateMonitor: *** register callback for com.android.systemui.keyguard.KeyguardSliceProvider$2@aacdbe3
+09-22 01:27:25.839  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.839  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.839  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.839  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.839  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.839  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.839  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.840  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.840  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.841  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.841  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.841  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.841  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.842  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.842  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.842  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.842  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.842  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.842  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.843  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.843  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.843  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.843  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.843  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.843  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.844  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.844  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.844  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.844  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.845  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.845  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.845  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.845  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.845  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.845  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.846  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.846  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.846  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.846  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.846  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.846  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.847  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.847  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.847  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.847  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.847  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.847  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.848  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.848  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.848  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.848  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.848  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.848  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.849  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.849  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.849  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.849  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.849  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.849  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.849  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.849  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.850  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.850  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.851  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.851  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.851  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.851  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.851  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.851  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.851  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.851  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.852  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.852  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.852  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.852  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.852  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.852  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.853  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.853  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.853  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.853  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.854  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.854  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.854  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.854  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.855  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.855  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.855  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.856  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.856  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.857  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.857  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.857  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.858  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.858  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.858  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.858  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.859  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.859  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.859  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.859  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.859  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.859  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.859  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.859  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.859  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.860  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.860  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.860  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.860  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.860  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.861  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.861  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.861  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.861  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.862  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.862  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.863  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.863  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.863  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.863  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.863  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.863  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.863  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.864  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.864  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.864  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.864  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.864  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.864  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.865  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.865  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.865  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.866  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.866  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.866  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.866  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.866  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.867  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.867  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.868  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.868  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.868  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.868  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.868  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.868  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.868  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.869  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.869  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.869  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.869  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.869  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.870  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.870  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.870  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.870  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.870  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.870  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.870  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.870  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.870  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.871  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.871  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.871  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.871  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.871  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.872  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.872  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.872  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.872  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.873  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.873  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.873  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.874  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.874  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.874  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.874  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.874  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.875  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.875  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.875  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.875  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.875  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.875  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.875  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.875  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.876  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.876  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.876  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.876  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.877  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.877  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.877  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.877  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.877  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.878  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.878  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.878  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.878  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.878  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.878  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.878  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.878  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.879  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.879  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.879  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.879  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.880  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.880  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.880  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.880  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.881  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.881  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.881  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.881  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.881  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.881  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.881  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.881  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.881  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.882  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.882  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.882  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.883  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.883  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.884  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.884  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.885  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.885  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.885  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.885  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.885  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.885  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.885  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.885  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.885  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.886  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.886  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.886  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.886  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.887  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.887  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.887  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.888  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.888  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.888  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.888  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.888  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.888  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.889  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.889  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.889  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.889  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.889  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.890  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.890  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.890  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.890  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.891  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.891  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.892  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.892  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.892  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.892  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.892  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.892  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.892  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.892  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.892  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.893  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.894  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.894  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.894  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.894  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.895  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.895  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.895  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.895  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11130
+09-22 01:27:25.895  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.895  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.895  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a101 and apptype 0x11134
+09-22 01:27:25.895  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.895  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.896  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.896  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.896  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.897  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.897  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.897  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.897  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.897  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.898  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(27) acdb_id(10)
+09-22 01:27:25.898  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.898  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11130
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.898  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.898  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.898  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.899  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.899  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.899  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.899  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.899  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.900  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.900  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.900  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.900  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.901  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.901  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.901  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.901  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a115 and apptype 0x11130
+09-22 01:27:25.901  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.901  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.901  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.902  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.902  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.902  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.902  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.902  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a115 and apptype 0x11134
+09-22 01:27:25.902  1051  2376 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:25.903  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.903  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.903  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.903  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.903  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.903  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:25.903  1051  2376 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:25.903  1051  2376 E ACDB-LOADER: [acdb_loader_store_set_audio_cal] ACDB settting parameters failed -1
+09-22 01:27:27.205  1051  1051 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:27.205  1051  1051 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11134
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:27.205  1051  1051 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:27:27.205  1051  1051 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.050  1051  2456 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11130
+09-22 01:27:29.050  1051  2456 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.050  1051  2456 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:29.050  1051  2456 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.052  1051  4648 D DlbQdspGefDriver: doCommit() with ACDB device id 10011, sample rate 48000, calibration type 1
+09-22 01:27:29.053  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11130
+09-22 01:27:29.053  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.053  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:29.053  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.053  1051  4648 D DlbQdspGefDriver: doCommit() with ACDB device id 10011, sample rate 48000, calibration type 1
+09-22 01:27:29.054  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11130
+09-22 01:27:29.054  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.054  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:29.054  1051  4648 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.120  1051  4734 D audio_hw_primary: select_devices: changing use case low-latency-playback output device from(0: , acdb -1) to (2: speaker, acdb 10011)
+09-22 01:27:29.129  1051  4734 D audio_hw_utils: audio_extn_utils_send_app_type_cfg: usecase->out_snd_device speaker
+09-22 01:27:29.130  1051  4734 I audio_hw_utils: send_app_type_cfg_for_device PLAYBACK app_type 69937, acdb_dev_id 10011, sample_rate 48000, snd_device_be_idx 87, channel is 2
+09-22 01:27:29.131  1051  4734 D DlbQdspGefDriver: eventCallback(): audio device 0x00000002 (sample rate 48000, channelMask 0x00000003, ACDB device id 10011, app type 0x11131, data 0) becomes active!
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_audio_cal, acdb_id = 10011, path = 0, app id = 0x11131, sample rate = 48000, afe_sample_rate = 48000
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_asm_topology
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_STREAM_TOPOLOGY_ID
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_adm_topology
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_COMMON_TOPOLOGY_ID
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_audtable
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_AUDPROC_CAL cal_type[11] acdb_id[10011] app_type[69937]
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 12
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE_SIZE
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> send_audstrmtable
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE
+09-22 01:27:29.131  1051  4734 D ACDB-LOADER: ACDB -> audstrm_cal->cal_type.cal_data.cal_size = 20
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> send_afe_topology
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_TOPOLOGY_ID
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> GET_AFE_TOPOLOGY_ID for adcd_id 10011, Topology Id 112fc
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> send_afe_cal
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: Error: ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE Returned = -19
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: Error: ACDB AFE returned = -19
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_AFE_CAL cal_type[16] acdb_id[10011]
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> send_hw_delay : acdb_id = 10011 path = 0
+09-22 01:27:29.132  1051  4734 D ACDB-LOADER: ACDB -> ACDB_AVSYNC_INFO: ACDB_CMD_GET_DEVICE_PROPERTY
+09-22 01:27:29.402  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:29.402  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:27:29.402  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.402  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:29.402  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11134
+09-22 01:27:29.402  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.403  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:29.403  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:27:29.403  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.403  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:29.403  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:27:29.403  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.416  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:27:29.416  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:27:29.416  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:27:29.418  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 40
+09-22 01:27:29.418  1051  4648 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:27:29.418  1051  4648 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:27:29.419  1051  4648 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:27:29.419  1051  4648 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 2
+09-22 01:27:29.419  1051  4648 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:27:29.419  1051  4648 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 40
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:27:30.079  1051  4648 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 40
+09-22 01:28:11.873  1051  7401 D audio_hw_primary: select_devices: changing use case deep-buffer-playback output device from(0: , acdb -1) to (2: speaker, acdb 10011)
+09-22 01:28:11.880  1051  7401 D audio_hw_utils: audio_extn_utils_send_app_type_cfg: usecase->out_snd_device speaker
+09-22 01:28:11.881  1051  7401 I audio_hw_utils: send_app_type_cfg_for_device PLAYBACK app_type 69940, acdb_dev_id 10011, sample_rate 48000, snd_device_be_idx 87, channel is 2
+09-22 01:28:11.882  1051  7401 D DlbQdspGefDriver: eventCallback(): audio device 0x00000002 (sample rate 48000, channelMask 0x00000003, ACDB device id 10011, app type 0x11134, data 0) becomes active!
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> send_audio_cal, acdb_id = 10011, path = 0, app id = 0x11134, sample rate = 48000, afe_sample_rate = 48000
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> send_asm_topology
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_STREAM_TOPOLOGY_ID
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> send_adm_topology
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_COMMON_TOPOLOGY_ID
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> send_audtable
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:28:11.883  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> AUDIO_SET_AUDPROC_CAL cal_type[11] acdb_id[10011] app_type[69940]
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 12
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE_SIZE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> send_audstrmtable
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> audstrm_cal->cal_type.cal_data.cal_size = 20
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> send_afe_topology
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_TOPOLOGY_ID
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> GET_AFE_TOPOLOGY_ID for adcd_id 10011, Topology Id 112fc
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> send_afe_cal
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: Error: ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE Returned = -19
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: Error: ACDB AFE returned = -19
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> AUDIO_SET_AFE_CAL cal_type[16] acdb_id[10011]
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> send_hw_delay : acdb_id = 10011 path = 0
+09-22 01:28:11.884  1051  7401 D ACDB-LOADER: ACDB -> ACDB_AVSYNC_INFO: ACDB_CMD_GET_DEVICE_PROPERTY
+09-22 01:28:11.987  1051  7401 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:28:11.989  1051  7401 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:28:11.989  1051  7401 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11134
+09-22 01:28:11.989  1051  7401 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:28:11.990  1051  7401 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:28:11.990  1051  7401 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:28:11.990  1051  7401 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:28:11.990  1051  7401 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:28:11.999  1051  7401 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 5
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:28:11.999  1051  7401 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 40
+09-22 01:28:12.001  1051  2379 D DlbQdspGefDriver: doCommit() with ACDB device id 10011, sample rate 48000, calibration type 1
+09-22 01:28:12.001  1051  2379 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11130
+09-22 01:28:12.001  1051  2379 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:28:12.005  1051  2379 D DlbQdspGefDriver: doCommit() with ACDB device id 10011, sample rate 48000, calibration type 1
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:28:24.058  1051  1119 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 40
+09-22 01:30:48.252  1051  4734 D audio_hw_utils: audio_extn_utils_send_app_type_cfg: usecase->out_snd_device speaker
+09-22 01:30:48.252  1051  4734 I audio_hw_utils: send_app_type_cfg_for_device PLAYBACK app_type 69937, acdb_dev_id 10011, sample_rate 48000, snd_device_be_idx 87, channel is 2
+09-22 01:30:48.256  1051  4734 D DlbQdspGefDriver: eventCallback(): audio device 0x00000002 (sample rate 48000, channelMask 0x00000003, ACDB device id 10011, app type 0x11131, data 0) becomes active!
+09-22 01:30:48.256  1051  4734 D ACDB-LOADER: ACDB -> send_audio_cal, acdb_id = 10011, path = 0, app id = 0x11131, sample rate = 48000, afe_sample_rate = 48000
+09-22 01:30:48.256  1051  4734 D ACDB-LOADER: ACDB -> send_asm_topology
+09-22 01:30:48.256  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_STREAM_TOPOLOGY_ID
+09-22 01:30:48.257  1051  4734 D ACDB-LOADER: ACDB -> send_adm_topology
+09-22 01:30:48.257  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_COMMON_TOPOLOGY_ID
+09-22 01:30:48.257  1051  4734 D ACDB-LOADER: ACDB -> send_audtable
+09-22 01:30:48.257  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_COMMON_TABLE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_AUDPROC_CAL cal_type[11] acdb_id[10011] app_type[69937]
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> send_audvoltable
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE, vol index 0
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_VOL_CAL cal type = 12
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE_SIZE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> send_audstrmtable
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AUDPROC_INSTANCE_STREAM_TABLE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> audstrm_cal->cal_type.cal_data.cal_size = 20
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> send_afe_topology
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_TOPOLOGY_ID
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> GET_AFE_TOPOLOGY_ID for adcd_id 10011, Topology Id 112fc
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> send_afe_cal
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: Error: ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE Returned = -19
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: Error: ACDB AFE returned = -19
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> AUDIO_SET_AFE_CAL cal_type[16] acdb_id[10011]
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> send_hw_delay : acdb_id = 10011 path = 0
+09-22 01:30:48.258  1051  4734 D ACDB-LOADER: ACDB -> ACDB_AVSYNC_INFO: ACDB_CMD_GET_DEVICE_PROPERTY
+09-22 01:30:48.359  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a100 and apptype 0x11134
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:30:48.359  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11134
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:30:48.359  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:30:48.359  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:30:48.360  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:30:48.360  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:30:48.360  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:30:48.372  1051  4734 D msm8974_platform: Setting audio calibration for snd_device(2) acdb_id(10011)
+09-22 01:30:48.372  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] active device/stream not found (result=-100) for topology 0x1000a106 and apptype 0x11131
+09-22 01:30:48.372  1051  4734 E ACDB-LOADER: [acdb_loader_adsp_set_audio_cal] set parameters failed with status -100
+09-22 01:34:11.223  8415  8415 W ls      : type=1400 audit(0.0:1424): avc: denied { getattr } for path="/vendor/lib64/libacdbloader.so" dev="dm-9" ino=2591 scontext=u:r:shell:s0 tcontext=u:object_r:vendor_file:s0 tclass=file permissive=0
+09-22 01:34:11.223  8415  8415 W ls      : type=1400 audit(0.0:1425): avc: denied { getattr } for path="/vendor/lib/libacdbloader.so" dev="dm-9" ino=1604 scontext=u:r:shell:s0 tcontext=u:object_r:vendor_file:s0 tclass=file permissive=0
+09-22 01:34:23.775  1585  1585 W /apex/com.android.adbd/bin/adbd: type=1400 audit(0.0:1557): avc: denied { getattr } for comm=73796E6320737663203233 path="/vendor/lib64/libacdbloader.so" dev="dm-9" ino=2591 scontext=u:r:adbd:s0 tcontext=u:object_r:vendor_file:s0 tclass=file permissive=0
+09-22 01:34:24.195  1585  1585 W /apex/com.android.adbd/bin/adbd: type=1400 audit(0.0:1558): avc: denied { getattr } for comm=73796E6320737663203233 path="/vendor/lib/libacdbloader.so" dev="dm-9" ino=1604 scontext=u:r:adbd:s0 tcontext=u:object_r:vendor_file:s0 tclass=file permissive=0
+[   22.065664] afe_get_cal_topology_id: port_id = 0x9020 acdb_id = 10011 topology_id = 0x112fc cal_type_index=8 ret=0
+[   22.065974] afe_send_port_topology_id: AFE set topology id 0x112fc  enable for port 0x9020 ret 0
+[   22.065977] send_afe_cal_type: cal_index is 0
+[   22.065980] send_afe_cal_type: dev_acdb_id[87] is 10011
+[   22.065989] send_afe_cal_type: Sending cal_index cal 0
+[   22.065992] send_afe_cal_type: No cal sent for cal_index 0, port_id = 0x9020! ret -22
+[   22.074516] q6asm_get_asm_topology_apptype: popp using topology 0x10c68 app_type 69937
+[   22.078686] adm_open:port 0x9020 path:1 rate:48000 channel_mode:2 perf_mode:1 topology 0x1000a100 bit_width 24 \x09\x09app_type 69937 acdb_id 10011 session_type 0 passthr_mode 0 
+[   64.655623] afe_get_cal_topology_id: port_id = 0x9020 acdb_id = 10011 topology_id = 0x112fc cal_type_index=8 ret=0
+[   64.655883] afe_send_port_topology_id: AFE set topology id 0x112fc  enable for port 0x9020 ret 0
+[   64.655887] send_afe_cal_type: cal_index is 0
+[   64.655891] send_afe_cal_type: dev_acdb_id[87] is 10011
+[   64.655905] send_afe_cal_type: Sending cal_index cal 0
+[   64.655908] send_afe_cal_type: No cal sent for cal_index 0, port_id = 0x9020! ret -22
+[   64.666399] q6asm_get_asm_topology_apptype: popp using topology 0x10c68 app_type 69940
+[   64.670427] adm_open:port 0x9020 path:1 rate:48000 channel_mode:2 perf_mode:0 topology 0x1000a100 bit_width 24 \x09\x09app_type 69940 acdb_id 10011 session_type 0 passthr_mode 0 
+[  221.032804] afe_get_cal_topology_id: port_id = 0x9020 acdb_id = 10011 topology_id = 0x112fc cal_type_index=8 ret=0
+[  221.033003] afe_send_port_topology_id: AFE set topology id 0x112fc  enable for port 0x9020 ret 0
+[  221.033005] send_afe_cal_type: cal_index is 0
+[  221.033008] send_afe_cal_type: dev_acdb_id[87] is 10011
+[  221.033018] send_afe_cal_type: Sending cal_index cal 0
+[  221.033021] send_afe_cal_type: No cal sent for cal_index 0, port_id = 0x9020! ret -22
+[  221.041087] q6asm_get_asm_topology_apptype: popp using topology 0x10c68 app_type 69937
+[  221.045056] adm_open:port 0x9020 path:1 rate:48000 channel_mode:2 perf_mode:1 topology 0x1000a100 bit_width 24 \x09\x09app_type 69937 acdb_id 10011 session_type 0 passthr_mode 0 
+[  252.202316] adm_callback: cmd = 0x1035e returned error = 0x2
+[  252.202330] adm_callback: ADM get param error = 2, resuming

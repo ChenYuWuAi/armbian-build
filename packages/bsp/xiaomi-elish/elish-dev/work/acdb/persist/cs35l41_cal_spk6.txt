@@ -1,0 +1,1 @@
+status = 1, Impedance = 6.68, cal_r = 9338, ambient = 23, checksum = 9339 

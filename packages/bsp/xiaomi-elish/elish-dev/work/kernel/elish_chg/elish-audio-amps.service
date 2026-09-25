@@ -1,0 +1,12 @@
+[Unit]
+Description=elish: factory amp parameters (Android PCM Gain + Channel Swap)
+After=sound.target multi-user.target
+ConditionPathExists=/sys/class/sound/card0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/elish-audio-amps.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

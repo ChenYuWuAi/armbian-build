@@ -1,0 +1,30 @@
+--- a/sound/soc/qcom/qdsp6/q6routing.c
++++ b/sound/soc/qcom/qdsp6/q6routing.c
+@@ -26,6 +26,18 @@
+ 
+ #define DRV_NAME "q6routing-component"
+ 
++/*
++ * ADM COPP topology id used when a session is routed.
++ * 0 keeps the upstream behaviour (NULL_COPP_TOPOLOGY, a pass-through COPP).
++ * Downstream/Android opens the speaker COPP with a real audproc topology
++ * (e.g. 0x1000a100) so the ADSP instantiates the volume / protection /
++ * IIR processing chain for the use case.
++ * Runtime tunable: /sys/module/q6routing/parameters/copp_topology
++ */
++static unsigned int copp_topology;
++module_param(copp_topology, uint, 0644);
++MODULE_PARM_DESC(copp_topology, "ADM COPP topology id (0 = NULL_COPP_TOPOLOGY)");
++
+ #define Q6ROUTING_RX_MIXERS(id)						\
+ 	SOC_SINGLE_EXT("MultiMedia1", id,				\
+ 	MSM_FRONTEND_DAI_MULTIMEDIA1, 1, 0, msm_routing_get_audio_mixer,\
+@@ -390,7 +402,7 @@
+ 	session->bits_per_sample = pdata->bits_per_sample;
+ 
+ 	payload.num_copps = 0; /* only RX needs to use payload */
+-	topology = NULL_COPP_TOPOLOGY;
++	topology = copp_topology ? copp_topology : NULL_COPP_TOPOLOGY;
+ 	copp = q6adm_open(routing_data->dev, session->port_id,
+ 			      session->path_type, session->sample_rate,
+ 			      session->channels, topology, perf_mode,

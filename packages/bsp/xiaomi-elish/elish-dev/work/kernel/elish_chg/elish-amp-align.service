@@ -1,0 +1,14 @@
+[Unit]
+Description=elish: align CS35L41 amp mixer with the vendor Android configuration
+Documentation=file:/home/axis/axis_rnd/work/kernel/AGENT_STATE.md
+After=sound.target alsa-restore.service
+Wants=alsa-restore.service
+ConditionPathExists=/proc/asound/card0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/elish-amp-align.sh
+
+[Install]
+WantedBy=multi-user.target
