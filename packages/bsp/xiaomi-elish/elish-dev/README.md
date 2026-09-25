@@ -247,6 +247,20 @@ for i in range(24):
   `-Werror=discarded-qualifiers` 编挂；需要
   `EXTRA_CFLAGS=-Wno-error=discarded-qualifiers` 或换旧版宿主 gcc。
 
+### 11. 开发流程 skill：`elish-kernel-bringup`
+
+把第 10 节这套流程（远程机编译 → 补丁入库 fork → 只换 DTB 的落地 / 开机验收 / 回滚）固化成了 skill：
+
+- 现场（DSH 用户级 skill 根，本会话已加载可用）：`~/.dsh/skills/elish-kernel-bringup/SKILL.md`
+- 入库副本：`packages/bsp/xiaomi-elish/elish-dev/skills/elish-kernel-bringup/SKILL.md`
+
+内容：现场拓扑核对；根因定位（读机制 → `/dev/mem` 硬件寄存器证据 → 对比原厂内核）；
+补丁生成（`diff -u` 机械生成 + 纯净树应用验证 + 板级 dtsi 优先 + 对齐同类机型做法）；
+只改 DTB 时的"逐节点 diff 证明只差预期改动"落地法；ABL 钩子刷入 +
+systemd 一次性开机自检 + 回滚脚本；以及必踩的坑清单（`/boot/vmlinuz` 可能不是在跑的内核、
+Android boot 头 `kernel_addr` 是加载地址、模块 `[permanent]` 不能 rmmod、脏树重打补丁会重复节点、
+宿主新 gcc 的 libbpf `-Werror`、ssh 里跑 git 会吃 stdin / 跟踪引用不更新、大文件不入库）。
+
 ## 不在本库中的内容
 
 - **小米原厂内核源码**（`MiCode/Xiaomi_Kernel_OpenSource`，分支 `elish-r-oss`）以及从中提取的
