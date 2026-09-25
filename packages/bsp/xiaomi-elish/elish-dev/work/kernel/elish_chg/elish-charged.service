@@ -1,0 +1,18 @@
+[Unit]
+Description=elish FC2 direct-charge daemon (PPS + dual bq25970 pumps)
+After=multi-user.target
+# 不阻塞任何服务；daemon 自己检测充电器在线才进入 FC2
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/elish-charged
+ExecStopPost=/usr/local/sbin/elish-charged-safety
+Restart=on-failure
+RestartSec=3
+# 充电相关安全：异常退出也要走清理路径（SIGTERM → daemon 的 on_signal）
+KillSignal=SIGTERM
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
