@@ -122,6 +122,108 @@ daemon 启动时会打印生效阈值，便于现场核对：
 - `dsh-sessions/*.zip` —— 5 份导出，`(4)`（2026-09-25 22:53）为最新；
   内部为 `session.v3.jsonl` + `subagents/*/session.v3.jsonl`
 
+### 10. CPU 频率：解锁 SM8250-AC 超大核 3.1872 GHz（原厂标称 3.2 GHz）
+
+**现象**：`policy7`（cpu7 超大核）最高只有 `2841600`，开机日志：
+
+```
+[    0.220023] cpu cpu7: failed to update OPP for freq=3187200
+[    0.220049] cpu cpu7: failed to update OPP for freq=3187200
+```
+
+**根因（机制差异，不是硬件问题、不是升频失败）**
+
+`drivers/cpufreq/qcom-cpufreq-hw.c` 的 `qcom_cpufreq_hw_read_lut()` 读硬件 EPSS
+频率 LUT 后，会拿 **DT 的 `operating-points-v2` 逐条交叉校验**：
+
+```c
+/* OPP 表带 icc 带宽时走这条分支 */
+ret = dev_pm_opp_adjust_voltage(cpu_dev, freq_hz, volt, volt, volt);
+if (ret) {                                       /* 频点不在 DT 表里 -> -ENOENT */
+        dev_warn(cpu_dev, "failed to update OPP for freq=%d\n", freq_khz);
+        table[i].frequency = CPUFREQ_ENTRY_INVALID;    /* 直接丢弃该档 */
+}
+```
+
+上游 `sm8250.dtsi` 的 `cpu7_opp_table` 是按 **SM8250（骁龙 865）**写的，止于
+`opp-2841600000`；本机是 **SM8250-AC（骁龙 870）**，LUT 多一档 3187200，于是被丢掉。
+原厂内核不做这个校验（下游 `qcom-cpufreq-hw.c` 直接把 LUT 逐条 `dev_pm_opp_add()`，
+DT 表无关），所以原厂能跑满。
+
+**硬件证据**（root 下 `/dev/mem` 直读 EPSS 寄存器；domain2 = cpu7 @ `0x18593000`，
+`reg_freq_lut=0x100`、row=4 B、xo=19.2 MHz、`freq = xo*lval/1000`）：
+
+| index | raw | lval | core_count | freq |
+|---|---|---|---|---|
+| 19 | `0x40040094` | 148 | 4 | 2841600 kHz |
+| **20** | `0x400300a6` | 166 | 3 | **3187200 kHz** ← DT 缺的就是这一档 |
+| 21+ | `0x400400a6` | 166 | 4 | 3187200 kHz（重复 = 表尾，驱动在此 `break`） |
+
+LUT 里**没有** 2995200/3091200（否则日志会出现更多条 `failed to update OPP`；
+上游 6.18 给 cpu7 加的 `opp-3091200000` 对这台机器的 LUT 不生效）。
+三簇完整 LUT dump 见 `from-tablet/fixes/` 的排查报告与本次会话记录。
+
+**修改**：`patch/kernel/archive/sm8250-6.12/0056-arm64-dts-qcom-sm8250-xiaomi-elish-add-3.2GHz-prime-OPP.patch`
+——只在**板级** `arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi` 末尾给
+`&cpu7_opp_table` 追加一档，不动 `sm8250.dtsi`（避免影响真正的 865 机型）：
+
+```dts
+&cpu7_opp_table {
+	opp-3187200000 {
+		opp-hz = /bits/ 64 <3187200000>;
+		opp-peak-kBps = <8368000 51609600>;   /* 与 2.8416 GHz 档一致 */
+	};
+};
+```
+
+做法与 Armbian 里同为 SM8250-AC 的 Lenovo Xiaoxin Pad Pro 12.6 一致
+（`patch/kernel/archive/sm8250-6.18/0020-arm64-dts-qcom-add-device-tree-for-Xiaoxin-Pad-Pro-1.patch`）。
+
+**换 DTB 的附带风险 = 0（已逐节点验证）**：把实际在跑的 DTB 从 `boot_b` 里抽出来反编译，
+与新编 DTB 反编译对比，**语义差异只有这一个 OPP 节点**（其余 7 行是 phandle 重编号）：
+
+```
+sudo dd if=/dev/disk/by-partlabel/boot_b of=/tmp/bootlive.img bs=1M count=32
+# 在镜像里找 FDT magic \xd0\x0d\xfe\xed，按头部 totalsize 导出 DTB
+dtc -I dtb -O dts -o live.dts   /tmp/live-real.dtb
+dtc -I dtb -O dts -o new.dts    arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-csot.dtb
+diff live.dts new.dts            # 只有 opp-3187200000
+```
+
+安装/验证/回滚（ABL 钩子用的是 `/usr/lib/linux-image-$KVER/qcom/*.dtb`，不是 `/boot/dtb-*`）：
+
+```
+sudo install -m644 <新 dtb> /usr/lib/linux-image-$KVER/qcom/sm8250-xiaomi-elish-csot.dtb
+sudo /etc/kernel/postinst.d/zz-update-abl-kernel $KVER     # 重生成镜像并 dd 到 boot_b
+sudo reboot
+```
+
+重启后 `elish-3g2-verify.service`（一次性）把自检写到 `~/3g2-verify.txt`；
+判定：`policy7/scaling_available_frequencies` 末尾出现 `3187200`，且 dmesg 无
+`failed to update OPP`。回滚脚本 `~/rollback-3g2.sh`（恢复 `.bak-3g2-*` 的 DTB 并重写 boot_b）。
+
+**LUT 读取复现**（root，三簇域名 0x18591000 / 0x18592000 / 0x18593000）：
+
+```python
+import mmap, struct
+f = open('/dev/mem', 'r+b')
+m = mmap.mmap(f.fileno(), 0x1000, offset=0x18593000)   # domain2 = cpu7
+for i in range(24):
+    w = struct.unpack_from('<I', m, 0x100 + i*4)[0]
+    print(i, hex(w), 'src=%d lval=%d cc=%d' % ((w>>30)&3, w & 0xff, (w>>16)&7),
+          '%d kHz' % (19200000 * (w & 0xff) // 1000))
+```
+
+**构建环境注意（本次踩到）**
+- 远端 `/home/axis/axis_rnd/work/kernel/build/linux-6.12.58` 是**脏树**（之前手工改过
+  `pm8150b.dtsi` 等），再跑一遍补丁序列会出现 `charger@1000` / `fuel-gauge@4000`
+  **重复节点**，DTC 报 `ERROR (duplicate_node_names)`，其它 qcom 板的 DTB 全都编不过。
+  要么从 `linux-6.12.58-gh.tar.gz` 重新解包再按序打补丁，要么先 `patch -R` 掉 0034/0035。
+  （不改动任何 `drivers/` 内核源码就无法解锁频率——**只改 DTS 即可**，本补丁即如此。）
+- 新宿主 gcc 会把 `tools/bpf/resolve_btfids` 的 libbpf 因
+  `-Werror=discarded-qualifiers` 编挂；需要
+  `EXTRA_CFLAGS=-Wno-error=discarded-qualifiers` 或换旧版宿主 gcc。
+
 ## 不在本库中的内容
 
 - **小米原厂内核源码**（`MiCode/Xiaomi_Kernel_OpenSource`，分支 `elish-r-oss`）以及从中提取的
