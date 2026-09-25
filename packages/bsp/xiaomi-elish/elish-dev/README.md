@@ -62,7 +62,7 @@ Mi Pad 5 Pro（elish, SM8250-AC / 骁龙 870）在 mainline 内核上的全部�
 
 ### 7. 电池功率聚合（btop / upower 显示整包功率）
 `work/kernel/elish_batt/` —— `elish_batt_agg.c`：把两颗 bq27z561 聚合成一个
-`battery` power_supply：
+`BAT0` power_supply（标准名，Vitals/upower 才认得）：
 
 - `power_now = V0*I0 + V1*I1`（整包功率，btop 直接取这个值显示瓦数）
 - `voltage_now` = 两芯相加（2S 整包电压），`current_now` = 两芯平均
@@ -73,13 +73,14 @@ Mi Pad 5 Pro（elish, SM8250-AC / 骁龙 870）在 mainline 内核上的全部�
 **不需要改 DTB**（按名字找已有的表计节点）。btop 侧在 `~/.config/btop/btop.conf`
 设 `selected_battery = "battery"`（btop 只在退出时写回配置，改完要重启 btop）。
 
-GNOME Shell 侧（Vitals 扩展 85）：见 `work/gnome/vitals-battery/`（补丁 + `install.sh`）。
-Vitals 的电池区块只认 `BAT0/BAT1/BAT2/BATT/CMB0/CMB1/CMB2/macsmc-battery` 八个硬编码
-名字（读 `<name>/uevent`），本机节点叫 `battery`；而且它的电池区块**原本不显示温度**。
-补丁：`BATTERY_PATHS` 增加 `8: 'battery'`（prefs.ui 下拉同步加一项），电池区块新增
-`Temperature`（uevent TEMP 是 0.1℃，`temp` 渲染按毫摄氏度要先 ×100）与 `Current`
-（uevent CURRENT_NOW 是 µA，交给 `milliamp` 渲染除 1000）两行，再设
-`battery-slot=8` 并重载扩展。实测显示：`Charging / 47% / 8.465V / 42.6℃ / 4179mA / +35.4W`。
+GNOME Shell 侧（Vitals 扩展 85）：`work/gnome/vitals-battery/`（补丁 + `install.sh`）。
+节点改成标准名 `BAT0` 后，Vitals 的电池区块本身就能列出 State/Percentage/Voltage/
+Power Rate（它只认 BAT0..BAT2/BATT/CMB*/macsmc-battery 这些硬编码名字）；补丁只额外
+加 `Temperature`（uevent TEMP 是 0.1℃，`temp` 渲染按毫摄氏度要先 ×100）与 `Current`
+（uevent CURRENT_NOW 是 µA，交给 `milliamp` 渲染除 1000）两行。实测：
+`Charging / 47% / 8.465V / 42.6℃ / 4179mA / +35.4W`。
+**注意**：Wayland 会话下 GNOME Shell 不热重载扩展 JS（disable/enable 无效，实测加了
+探测 `log()` 一直不出现），改完扩展必须重新登录/重启会话才生效。
 
 ### 8. 运行期约束（重要，踩过的坑）
 - 当前运行内核把模块的退出段丢掉了，`/proc/modules` 里**所有模块都是

@@ -7,7 +7,7 @@
  * 所以 btop / upower / GNOME 只会挑到其中一颗电芯，看到的功率大约只有整包的一半
  * （例：单芯 4.15V x 4.0A = 16.6W，而整包实际是 34W）。
  *
- * 本模块把两颗表计聚合成一个 "battery" power_supply：
+ * 本模块把两颗表计聚合成一个 "BAT0" power_supply（用标准名，Vitals/upower 才认得）：
  *   voltage_now = V0 + V1            整包电压
  *   current_now = (I0 + I1) / 2      串联电流相同，取平均
  *   power_now   = V0*I0 + V1*I1      整包功率（btop 直接取这个值算瓦数）
@@ -209,7 +209,8 @@ static int elish_batt_get_property(struct power_supply *psy,
 }
 
 static const struct power_supply_desc elish_batt_desc = {
-	.name		= "battery",
+	/* 用标准名字 BAT0：GNOME/Vitals 这类工具只认硬编码的 BAT0..BAT2/BATT/CMB* */
+	.name		= "BAT0",
 	.type		= POWER_SUPPLY_TYPE_BATTERY,
 	.properties	= elish_batt_props,
 	.num_properties	= ARRAY_SIZE(elish_batt_props),

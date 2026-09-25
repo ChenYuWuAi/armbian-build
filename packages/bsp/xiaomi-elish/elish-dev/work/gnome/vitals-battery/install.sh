@@ -1,30 +1,28 @@
 #!/bin/bash
-# 给 GNOME Shell 的 Vitals 扩展接上 elish 的 2S 电池包聚合节点：
-#   1) BATTERY_PATHS 增加 slot 8 -> 'battery'（elish_batt_agg 模块提供的节点）
-#   2) 电池区块新增 Temperature / Current 两行
-#   3) 设 battery-slot=8 并重载扩展
+# 给 GNOME Shell 的 Vitals 扩展补上 elish 电池的 Temperature / Current 两行。
+#
+# 背景：
+#  - elish 的整包电池节点由 elish_batt_agg 模块提供，名字是标准的 BAT0，
+#    所以 Vitals 原本就能读到 State/Percentage/Voltage/Power Rate，无需改代码。
+#  - 但 Vitals 85 的电池区块不读 uevent 里的 TEMP / CURRENT_NOW，
+#    本补丁加上 Temperature / Current 两行。
+#  - Wayland 会话下 GNOME Shell 不会热重载扩展 JS（disable/enable 无效），
+#    打完补丁必须重新登录 / 重启会话才会生效。
 set -u
 EXT="${1:-$HOME/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com}"
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 [ -d "$EXT" ] || { echo "找不到 Vitals 扩展目录: $EXT"; exit 1; }
 
-if grep -q "8: 'battery'" "$EXT/sensors.js"; then
-	echo "补丁已存在，跳过打补丁"
+if grep -q "elish: 电池温度" "$EXT/sensors.js"; then
+	echo "补丁已存在，跳过"
 else
 	cp -a "$EXT/sensors.js" "$EXT/sensors.js.bak-$(date +%m%d-%H%M%S)"
-	cp -a "$EXT/prefs.ui"   "$EXT/prefs.ui.bak-$(date +%m%d-%H%M%S)"
 	(cd "$EXT" && patch -p1 --forward < "$DIR/vitals-elish-battery.patch")
 fi
 
 export GSETTINGS_SCHEMA_DIR="$EXT/schemas"
-gsettings set org.gnome.shell.extensions.vitals battery-slot 8 || true
+# BAT0 = elish_batt_agg 聚合出的 2S 整包节点，对应 Vitals 下拉第一项
+gsettings set org.gnome.shell.extensions.vitals battery-slot 0 || true
 
-if command -v gnome-extensions >/dev/null; then
-	export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-	export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
-	gnome-extensions disable Vitals@CoreCoding.com >/dev/null 2>&1 || true
-	sleep 1
-	gnome-extensions enable Vitals@CoreCoding.com >/dev/null 2>&1 || true
-fi
-echo "完成：Vitals 电池区块现在读 /sys/class/power_supply/battery/uevent"
+echo "完成。注意：需要重新登录（或重启会话）GNOME Shell 才会加载新的扩展代码。"
