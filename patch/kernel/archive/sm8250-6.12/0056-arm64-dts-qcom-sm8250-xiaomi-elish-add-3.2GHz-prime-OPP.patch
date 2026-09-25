@@ -1,0 +1,22 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
+@@ -1275,3 +1275,19 @@
+ 	firmware-name = "qcom/sm8250/xiaomi/elish/venus.mbn";
+ 	status = "okay";
+ };
++
++/*
++ * The SM8250-AC (Snapdragon 870) prime core has one more EPSS LUT entry
++ * than the SM8250 tables describe: 3187200 kHz (3.1872 GHz).
++ * qcom-cpufreq-hw cross-validates the hardware LUT against the DT OPP
++ * table and marks every frequency that is missing there as invalid, so
++ * without this entry the prime core stays capped at 2841600 kHz:
++ *   cpu cpu7: failed to update OPP for freq=3187200
++ * Keep opp-peak-kBps identical to the 2.8416 GHz entry.
++ */
++&cpu7_opp_table {
++	opp-3187200000 {
++		opp-hz = /bits/ 64 <3187200000>;
++		opp-peak-kBps = <8368000 51609600>;
++	};
++};
