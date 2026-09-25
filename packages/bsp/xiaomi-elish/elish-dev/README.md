@@ -82,6 +82,31 @@ Power Rate（它只认 BAT0..BAT2/BATT/CMB*/macsmc-battery 这些硬编码名字
 **注意**：Wayland 会话下 GNOME Shell 不热重载扩展 JS（disable/enable 无效，实测加了
 探测 `log()` 一直不出现），改完扩展必须重新登录/重启会话才生效。
 
+### 7b. 充电温控与原厂对齐（以电池温度为核心）
+
+原厂（Xiaomi/Qualcomm `pd_policy_manager` + SMB5 + Android thermal HAL）做的是
+**电池温度驱动**的热控，芯片结温只靠芯片自身的硬件热调节。本实现逐项对齐：
+
+| 原厂逻辑 | 出处 | 本实现 |
+|---|---|---|
+| 电荷泵 JEITA：warm 48.0℃ / cool 10.0℃ / 滞回 2.0℃，**锁存**（越界禁泵，回到带内才恢复） | `pd_policy_manager.c: pd_disable_cp_by_jeita_status()`；DT `mi,pd-battery-warm-th = <480>` 覆盖默认 450 | `cp_jeita_out_of_range()`，FC2 进入与维持都走它 |
+| thermal level ≥ 12 退出 FC2 | DT `mi,therm-level-threshold = <12>`（默认 13） | `thermal_level() >= THERM_LEVEL_THRESHOLD` |
+| 从泵只在 level < 9 且容量 < 80% 时允许 | `MAX_THERMAL_LEVEL_FOR_DUAL_BQ = 9`、`CAPACITY_HIGH_THR_NORMAL = 80` | `ST_FC2_ENTRY_3` 的从泵条件 |
+| JEITA FCC/FV 分档 | 原厂 DTBO `jeita-fcc-ranges` / `jeita-fv-ranges` | `jeita_fcc[]` / `jeita_fv[]` |
+| FCC 阶梯 | DTS `qcom,thermal-fcc-pps-bq`（16 级） | `thermal_fcc_pps_bq[]`（逐值一致） |
+| ICL 阶梯 | DTS `qcom,thermal-mitigation-pd-base`（16 级） | `thermal_icl_pd[]` |
+| thermal level 来自 Android thermal HAL 写 SMB5 的 `CHARGE_CONTROL_LIMIT` | 用户态 HAL，Linux 侧没有 | **唯一近似项**：`level = (电池温度 - 43.0) / 1.0`（clamp 0..15） |
+| 泵芯片结温只靠芯片自身热调节 125℃/145℃ | 厂版 DT | 另加一道软件兜底 75/85℃（正常快充结温 53~60℃，不会触发） |
+| daemon 意外退出 | — | `ExecStopPost=/usr/local/sbin/elish-charged-safety`：关两颗泵 + 恢复 SW 路径 |
+
+daemon 启动时会打印生效阈值，便于现场核对：
+
+```
+[chg] thermal: 泵窗口 100..480 (滞回 20, 锁存), ladder 起 43.0C, level 阈值 12, 双泵需 level<9, 结温兜底 75/85C
+```
+
+`elish-charged --selftest` 可在不接硬件的情况下验证结温兜底曲线的边界（10 个用例）。
+
 ### 8. 运行期约束（重要，踩过的坑）
 - 当前运行内核把模块的退出段丢掉了，`/proc/modules` 里**所有模块都是
   `[permanent]`**（`mod->init && !mod->exit`）⇒ **任何模块都 rmmod 不掉（EBUSY）**。

@@ -1,0 +1,10 @@
+#!/bin/sh
+# elish-charged 意外退出时的兜底：关掉两颗电荷泵并把 SW 路径放回去，
+# 避免泵在无人监管下继续充电（JEITA/温控都失效的情形）。
+for d in /sys/bus/i2c/devices/15-0065 /sys/bus/i2c/devices/15-0066; do
+	[ -w "$d/charge_enabled" ] && echo 0 > "$d/charge_enabled"
+done
+if [ -w /sys/class/power_supply/pm8150b-charger/charge_enabled ]; then
+	echo 1 > /sys/class/power_supply/pm8150b-charger/charge_enabled
+fi
+exit 0

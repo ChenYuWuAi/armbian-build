@@ -76,6 +76,19 @@ static const int thermal_fcc_pps_bq[] = {
 #define THERM_START_DDC 430   /* 43.0C: begin stepping down */
 #define THERM_STEP_DDC   10    /* one ladder level per 1.0C */
 
+/* ---- 原厂电荷泵热控门限（pd_policy_manager.h + elish DT 覆盖）----
+ * JEITA_WARM_THR=450 / JEITA_COOL_NOT_ALLOW_CP_THR=100 / JEITA_HYSTERESIS=20；
+ * elish 的 DT 把 warm 覆盖成 480（mi,pd-battery-warm-th）。
+ * 原厂判定是**锁存**的：越界即禁泵，只有回到 warm-hyst .. cool+hyst 之间才恢复
+ * （pd_disable_cp_by_jeita_status()）。
+ * 另外 DT 把 mi,therm-level-threshold 覆盖成 12：thermal level >= 12 退出 FC2；
+ * 从泵只在 level < 9（MAX_THERMAL_LEVEL_FOR_DUAL_BQ）且容量 < 80% 时允许。 */
+#define JEITA_CP_WARM_DDC          480
+#define JEITA_CP_COOL_DDC          100
+#define JEITA_CP_HYST_DDC           20
+#define THERM_LEVEL_THRESHOLD       12
+#define THERM_LEVEL_FOR_DUAL_BQ      9
+
 /* thermal-mitigation-pd-base (ICL ladder for the SW path, uA) */
 static const int thermal_icl_pd[] = {
 	3000000, 2800000, 2600000, 2400000, 2200000, 2000000, 1800000,
@@ -120,10 +133,19 @@ static const int thermal_icl_pd[] = {
  * 芯片自身的热调节阈值在 DT 里是 145℃(master)/125℃(slave)，那只是最后一道
  * 硬件保护；这里在软件侧提前收电流，避免泵长期贴着高温跑。
  * 降额只作用在本轮的 fcc 上（不改 eff_fcc_ma），所以结温降下来后能自动恢复。 */
-#define TDIE_DERATE_START_C        65   /* 从这颗结温开始降流 */
-#define TDIE_DERATE_STEP_MA       300   /* 每高 1℃ 降 300mA */
+/* ---- 泵芯片结温兜底（不是主控！）----
+ * 原厂的电池温控完全靠电池温度（JEITA + thermal-fcc-pps-bq 阶梯），芯片结温只靠
+ * 芯片自身的硬件热调节（DT 阈值 145℃(master)/125℃(slave)）。这里加一道软件兜底
+ * 阈值取得比硬件低得多，正常快充（实测结温 53~60℃）不会触发，只有散热异常时才介入。 */
+#define TDIE_DERATE_START_C        75   /* 兜底起点 */
+#define TDIE_DERATE_STEP_MA       400   /* 每高 1℃ 降 400mA */
 #define TDIE_DERATE_FLOOR_MA     3000   /* 降额下限 */
-#define TDIE_HARD_STOP_C           80   /* 超过就退出 FC2，交回 SW 路径 */
+#define TDIE_HARD_STOP_C           85   /* 超过就退出 FC2，交回 SW 路径 */
+
+/* 可用 --tdie-start / --tdie-stop 覆盖（自检与现场验证用） */
+static int tdie_start_c = TDIE_DERATE_START_C;
+static int tdie_stop_c  = TDIE_HARD_STOP_C;
+static int tdie_peak;           /* 本轮 FC2 见过的最高结温 */
 
 enum {
 	ST_CHECK,
@@ -286,6 +308,35 @@ static int step_lookup(const struct range_step *tbl, int uv)
 	return last > 0 ? last : tbl[0].fcc_ua;
 }
 
+/* 热控等级：原厂由 Android thermal HAL 写进 SMB5 的 CHARGE_CONTROL_LIMIT，
+ * Linux 侧没有这个 HAL，这里用电池温度近似（配合 thermal_fcc_pps_bq 表）。
+ * 原厂 DT 的两条用法：level >= 12 退出 FC2、level >= 9 不允许双泵。 */
+static int thermal_level(void)
+{
+	int level = 0;
+
+	if (temp_ddc >= THERM_START_DDC)
+		level = (temp_ddc - THERM_START_DDC) / THERM_STEP_DDC;
+	if (level >= THERM_FCC_LEVELS)
+		level = THERM_FCC_LEVELS - 1;
+	return level;
+}
+
+/* 复刻原厂 pd_disable_cp_by_jeita_status()：越界禁泵并锁存，
+ * 只有回到 [cool+hyst, warm-hyst] 带内才解除。 */
+static bool cp_jeita_out_of_range(void)
+{
+	static bool latched;
+
+	if (temp_ddc >= JEITA_CP_WARM_DDC || temp_ddc <= JEITA_CP_COOL_DDC)
+		latched = true;
+	else if (latched &&
+		 temp_ddc <= JEITA_CP_WARM_DDC - JEITA_CP_HYST_DDC &&
+		 temp_ddc >= JEITA_CP_COOL_DDC + JEITA_CP_HYST_DDC)
+		latched = false;
+	return latched;
+}
+
 static int profile_fcc_ua(void)
 {
 	int fcc = PD_BAT_CURR_MAX_MA * 1000;
@@ -316,15 +367,9 @@ static int profile_fcc_ua(void)
 	if (step_ua < fcc)
 		fcc = step_ua;
 
-	/* thermal derating ladder (battery temp) */
-	if (temp_ddc >= THERM_START_DDC) {
-		int level = (temp_ddc - THERM_START_DDC) / THERM_STEP_DDC;
-
-		if (level >= THERM_FCC_LEVELS)
-			level = THERM_FCC_LEVELS - 1;
-		if (thermal_fcc_pps_bq[level] < fcc)
-			fcc = thermal_fcc_pps_bq[level];
-	}
+	/* thermal mitigation ladder（原厂 thermal-fcc-pps-bq，按 thermal level） */
+	if (thermal_fcc_pps_bq[thermal_level()] < fcc)
+		fcc = thermal_fcc_pps_bq[thermal_level()];
 	return fcc;
 }
 
@@ -341,16 +386,8 @@ static int profile_fv_mv(void)
 
 static int profile_sw_icl_ua(void)
 {
-	int level = 0, icl;
-
-	if (temp_ddc >= THERM_START_DDC) {
-		level = (temp_ddc - THERM_START_DDC) / THERM_STEP_DDC;
-		if (level >= THERM_FCC_LEVELS)
-			level = THERM_FCC_LEVELS - 1;
-	}
-	icl = thermal_icl_pd[level];
-	/* cold: stock dcp/qc tables cap lower; mirror with the same ladder */
-	return icl;
+	/* 原厂 thermal-mitigation-pd-base，同样按 thermal level 取 */
+	return thermal_icl_pd[thermal_level()];
 }
 
 /* ======== SW (switch) charger path control ======== */
@@ -530,6 +567,50 @@ static void fc2_teardown(bool restore_sw)
 		sw_enable(true);
 }
 
+/* 结温 -> fcc 上限。低于起点不动；超过起点每 1℃ 减 TDIE_DERATE_STEP_MA，
+ * 触底到 TDIE_DERATE_FLOOR_MA。抽成函数是为了能单独自检（--selftest）。 */
+static int tdie_fcc_cap(int die_max, int fcc)
+{
+	int cap;
+
+	if (die_max == PUMP_INVALID || die_max < tdie_start_c)
+		return fcc;
+	cap = PD_BAT_CURR_MAX_MA - (die_max - tdie_start_c) * TDIE_DERATE_STEP_MA;
+	if (cap < TDIE_DERATE_FLOOR_MA)
+		cap = TDIE_DERATE_FLOOR_MA;
+	return cap < fcc ? cap : fcc;
+}
+
+/* --selftest：不接硬件也能验证降额曲线的边界 */
+static int selftest(void)
+{
+	static const struct { int die, fcc, want; } t[] = {
+		{ 40, 12400, 12400 },   /* 低于起点：不变 */
+		{ 74, 12400, 12400 },   /* 起点之下 */
+		{ 75, 12400, 12400 },   /* 正好起点：(75-75)*400 = 0 */
+		{ 76, 12400, 12000 },
+		{ 80, 12400, 10400 },
+		{ 85, 12400,  8400 },
+		{ 90, 12400,  6400 },
+		{ 100, 12400, 3000 },   /* 触底 */
+		{ 80,  9000,  9000 },   /* 已经比上限低：取小值 */
+		{ PUMP_INVALID, 12400, 12400 },
+	};
+	int i, fail = 0;
+
+	for (i = 0; i < (int)(sizeof(t) / sizeof(t[0])); i++) {
+		int got = tdie_fcc_cap(t[i].die, t[i].fcc);
+
+		printf("[selftest] die=%4d fcc=%5d -> %5d (want %5d) %s\n",
+		       t[i].die, t[i].fcc, got, t[i].want,
+		       got == t[i].want ? "ok" : "FAIL");
+		if (got != t[i].want)
+			fail = 1;
+	}
+	printf("[selftest] %s\n", fail ? "FAILED" : "all passed");
+	return fail;
+}
+
 static int fc2_tune(int *next, int profile_fcc_ma)
 {
 	int fcc;
@@ -547,9 +628,10 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 		fcc = FCC_MAX_MASTER_ONLY_MA;
 
 	/* ---- 泵结温降额环 ----
-	 * 两颗泵取更高的结温；超过 TDIE_DERATE_START_C 后每升高 1℃ 把本轮 fcc
-	 * 收 300mA（下限 TDIE_DERATE_FLOOR_MA），三环控制会跟着把 ibus 目标压下来；
-	 * 到 TDIE_HARD_STOP_C 直接退出 FC2 交给 SW 路径（并退避 10s）。 */
+	 * 两颗泵取更高的结温；超过 tdie_start_c 后每升高 1℃ 把本轮 fcc 收
+	 * TDIE_DERATE_STEP_MA（下限 TDIE_DERATE_FLOOR_MA），三环控制会跟着把
+	 * ibus 目标压下来；到 tdie_stop_c 直接退出 FC2 交给 SW 路径（并退避 10s）。
+	 * 实测：空载 39~42℃，快充 53~60℃；芯片自身热调节阈值 125/145℃（DT）。 */
 	{
 		int die_max = PUMP_INVALID;
 
@@ -557,24 +639,21 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 			die_max = p_tdie_m;
 		if (p_tdie_s != PUMP_INVALID && p_tdie_s > die_max)
 			die_max = p_tdie_s;
+		if (die_max != PUMP_INVALID && die_max > tdie_peak)
+			tdie_peak = die_max;
 
-		if (die_max != PUMP_INVALID && die_max >= TDIE_HARD_STOP_C) {
+		if (die_max != PUMP_INVALID && die_max >= tdie_stop_c) {
 			logd("pump die %dC >= %dC, exit fc2\n", die_max,
-			     TDIE_HARD_STOP_C);
+			     tdie_stop_c);
 			*next = ST_FC2_EXIT;
 			pps_backoff = 20;   /* 10s 内不再进 FC2 */
 			return 0;
 		}
-		if (die_max != PUMP_INVALID && die_max >= TDIE_DERATE_START_C) {
-			int cap = PD_BAT_CURR_MAX_MA -
-				  (die_max - TDIE_DERATE_START_C) * TDIE_DERATE_STEP_MA;
+		if (tdie_fcc_cap(die_max, fcc) < fcc) {
+			int cap = tdie_fcc_cap(die_max, fcc);
 
-			if (cap < TDIE_DERATE_FLOOR_MA)
-				cap = TDIE_DERATE_FLOOR_MA;
-			if (cap < fcc) {
-				logd("pump die %dC, fcc %d -> %d\n", die_max, fcc, cap);
-				fcc = cap;
-			}
+			logd("pump die %dC, fcc %d -> %d\n", die_max, fcc, cap);
+			fcc = cap;
 		}
 	}
 
@@ -705,10 +784,23 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 int main(int argc, char **argv)
 {
 	int state = ST_CHECK;
-	int n;
+	int n, i;
 
-	if (argc > 1 && !strcmp(argv[1], "-q"))
-		dbg = 0;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-q"))
+			dbg = 0;
+		else if (!strcmp(argv[i], "--tdie-start") && i + 1 < argc)
+			tdie_start_c = atoi(argv[++i]);
+		else if (!strcmp(argv[i], "--tdie-stop") && i + 1 < argc)
+			tdie_stop_c = atoi(argv[++i]);
+		else if (!strcmp(argv[i], "--selftest"))
+			return selftest();
+		else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+			printf("用法: %s [-q] [--tdie-start C] [--tdie-stop C] [--selftest]\n",
+			       argv[0]);
+			return 0;
+		}
+	}
 
 	signal(SIGINT, on_signal);
 	signal(SIGTERM, on_signal);
@@ -722,6 +814,12 @@ int main(int argc, char **argv)
 	pump_set(pump_slave, false);
 
 	logd("elish-charged start\n");
+	logd("thermal: 泵窗口 %d..%d (滞回 %d, 锁存), ladder 起 %d.%dC, "
+	     "level 阈值 %d, 双泵需 level<%d, 结温兜底 %d/%dC\n",
+	     JEITA_CP_COOL_DDC, JEITA_CP_WARM_DDC, JEITA_CP_HYST_DDC,
+	     THERM_START_DDC / 10, THERM_START_DDC % 10,
+	     THERM_LEVEL_THRESHOLD, THERM_LEVEL_FOR_DUAL_BQ,
+	     tdie_start_c, tdie_stop_c);
 	while (running) {
 		if (battery_read())
 			goto sleep;
@@ -776,8 +874,10 @@ int main(int argc, char **argv)
 				if (vbat_mv > PD_BAT_VOLT_MAX_MV - BQ_TAPER_HYS_MV ||
 				    cap_pct >= CAP_TOO_HIGH_THR)
 					break;
-				if (temp_ddc < 151 || temp_ddc >= 480)
-					break;   /* pumps only 15.1..47.9C */
+				/* 原厂 JEITA 锁存判定：越界禁泵，回带到
+				 * [cool+hyst, warm-hyst] 内才解除 */
+				if (cp_jeita_out_of_range())
+					break;
 				if (n < START_DC_FCC_MIN_MA)
 					break;
 				logd("entry: vbat=%d cap=%d t=%d fcc=%d\n",
@@ -839,8 +939,10 @@ int main(int argc, char **argv)
 				master_on = true;
 				usleep(200000);
 			}
+			/* 原厂：从泵只在 thermal level < 9 且容量 < 80% 时允许 */
 			if (!slave_on && pump_slave[0] &&
-			    cap_pct < CAP_HIGH_THR && temp_ddc < 460) {
+			    cap_pct < CAP_HIGH_THR &&
+			    thermal_level() < THERM_LEVEL_FOR_DUAL_BQ) {
 				pump_set(pump_slave, true);
 				slave_on = true;
 			}
@@ -857,8 +959,9 @@ int main(int argc, char **argv)
 			{
 				int next = state;
 
-				if (tcpm_online < 1 || temp_ddc >= 480 ||
-				    temp_ddc < 151 ||
+				/* 原厂：JEITA 锁存越界，或 thermal level >= 12 */
+				if (tcpm_online < 1 || cp_jeita_out_of_range() ||
+				    thermal_level() >= THERM_LEVEL_THRESHOLD ||
 				    vbat_mv > PD_BAT_VOLT_MAX_MV - BQ_TAPER_HYS_MV ||
 				    cap_pct >= CAP_TOO_HIGH_THR)
 					next = ST_FC2_EXIT;
@@ -871,7 +974,9 @@ int main(int argc, char **argv)
 
 		case ST_FC2_EXIT:
 			fc2_teardown(true);
-			logd("fc2 exit\n");
+			logd("fc2 exit (peak die %dC, 阈 %d/%d)\n", tdie_peak,
+			     tdie_start_c, tdie_stop_c);
+			tdie_peak = 0;
 			state = ST_CHECK;
 			eff_fcc_ma = PD_BAT_CURR_MAX_MA;
 			no_need_slave = 0;
