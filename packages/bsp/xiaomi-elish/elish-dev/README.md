@@ -35,7 +35,7 @@ Mi Pad 5 Pro（elish, SM8250-AC / 骁龙 870）在 mainline 内核上的全部�
 - 报告：`ELISH_AMP_TDM_FIX.md`、`ELISH_AMP_ANDROID_DIFF.md`、
   `work/android/ANDROID_PIPELINE_RE_2026-09-22.md`、`ACDB_PORT_PLAN.md`
 
-### 2. 充电（PPS 快充 / 双电荷泵）
+### 2. 充电（PPS 快充 / 双电荷泵 + 泵结温降额）
 - `work/kernel/elish_chg/` —— `bq2597x_elish.c`（双泵驱动，master/slave 使能顺序）、
   `elish-fc2.c`（原厂 FC2 算法复刻）、`elish-charged.c`（PPS 策略守护）、
   `ampreg.c`、`*.service`、`deploy-m2.sh` / `verify-m2.sh`、`test_curves.c` / `dryrun.c` / `elish-fc2`
@@ -60,7 +60,31 @@ Mi Pad 5 Pro（elish, SM8250-AC / 骁龙 870）在 mainline 内核上的全部�
 - `lp_extract.py` / `lp_extract_local.py` / `lp_list.py`
 - `ELISH_RECOVERY_2026-09-21.md`、`ELISH_UNBRICK_GUIDE.md`、`SESSION_SUMMARY.md`
 
-### 7. 会话历史
+### 7. 电池功率聚合（btop / upower 显示整包功率）
+`work/kernel/elish_batt/` —— `elish_batt_agg.c`：把两颗 bq27z561 聚合成一个
+`battery` power_supply：
+
+- `power_now = V0*I0 + V1*I1`（整包功率，btop 直接取这个值显示瓦数）
+- `voltage_now` = 两芯相加（2S 整包电压），`current_now` = 两芯平均
+- `capacity` = 两芯取小，`temp` = 两芯取大，`status` 按充电/放电/满/未充优先级
+
+原因：mainline 没有原厂 `dual_fuel_gauge_class` 那样的聚合节点，btop 只会在
+两颗表计里挑到一颗，显示的功率只有整包的一半（实测单芯 16.6W vs 整包 34W）。
+**不需要改 DTB**（按名字找已有的表计节点）。btop 侧在 `~/.config/btop/btop.conf`
+设 `selected_battery = "battery"`（btop 只在退出时写回配置，改完要重启 btop）。
+
+### 8. 运行期约束（重要，踩过的坑）
+- 当前运行内核把模块的退出段丢掉了，`/proc/modules` 里**所有模块都是
+  `[permanent]`**（`mod->init && !mod->exit`）⇒ **任何模块都 rmmod 不掉（EBUSY）**。
+  驱动 `.ko` 的改动只有**重启**后才生效；用户态（daemon）改动随时可切换。
+  之前"改了驱动但 `tdie_raw` 还是 0"就是这个原因——模块根本没重载成功。
+- 因此 `bq2597x_elish.c` 里使能 TDIE 的改动本次无法立即生效，另加
+  `elish-pump-tdie.service`（oneshot，`i2cset` 清 REG_15 bit0）在运行期补上。
+- 泵结温降额（`fc2_tune()`）：两颗泵取更高结温，>65℃ 起每 1℃ 降 300mA、
+  下限 3000mA，≥80℃ 直接退出 FC2 并退避 10s。实测空载 44~50℃、
+  双泵满载（~34W 电池功率）54~60℃；芯片自身热调节阈值是 125/145℃（DT）。
+
+### 9. 会话历史
 - `dsh-sessions/*.zip` —— 5 份导出，`(4)`（2026-09-25 22:53）为最新；
   内部为 `session.v3.jsonl` + `subagents/*/session.v3.jsonl`
 

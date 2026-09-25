@@ -106,10 +106,24 @@ static const int thermal_icl_pd[] = {
 #define BUS_VOLT_INIT_UP_MV       400
 #define STEP_MV                    20
 #define FC2_STEP_MA                50
+#define FC2_STEPS                   1    /* 原厂 pm_config.fc2_steps */
+#define HIGH_IBUS_LIMI_THR_MA    4000    /* 原厂 HIGH_IBUS_LIMI_THR_MA */
+#define IBUS_TARGET_COMP_MA       100    /* 原厂 IBUS_TARGET_COMP_MA */
+#define SLAVE_SETTLE_TICKS         12    /* 从泵使能后静置 ~6s 再判 ibus（实测爬坡需 4s+）*/
 #define LOOP_MS                    500
 #define PUMP_INVALID              (-999999)
 #define IBUS_SLAVE_OFF_MA          450
 #define VBUS_TUNE_MAX              80
+
+/* ---- 泵芯片结温降额（tdie_raw，℃ 整数）----
+ * 实测：空载 44~50℃，双泵满载（~34W 电池功率）时 54~60℃。
+ * 芯片自身的热调节阈值在 DT 里是 145℃(master)/125℃(slave)，那只是最后一道
+ * 硬件保护；这里在软件侧提前收电流，避免泵长期贴着高温跑。
+ * 降额只作用在本轮的 fcc 上（不改 eff_fcc_ma），所以结温降下来后能自动恢复。 */
+#define TDIE_DERATE_START_C        65   /* 从这颗结温开始降流 */
+#define TDIE_DERATE_STEP_MA       300   /* 每高 1℃ 降 300mA */
+#define TDIE_DERATE_FLOOR_MA     3000   /* 降额下限 */
+#define TDIE_HARD_STOP_C           80   /* 超过就退出 FC2，交回 SW 路径 */
 
 enum {
 	ST_CHECK,
@@ -365,6 +379,8 @@ static void sw_enable(bool on)
 
 /* ======== pump ======== */
 static int p_vbus, p_vbat, p_ibus, p2_ibus;
+static int p_tdie_m, p_tdie_s;  /* 泵芯片结温（℃，读不到为 PUMP_INVALID） */
+static int p_vbat_reg;          /* 泵硬件进入 vbat 调节（驱动新增属性；读不到按 0 处理） */
 static bool master_on, slave_on;
 
 static void pump_read(void)
@@ -373,6 +389,8 @@ static void pump_read(void)
 
 	p_vbus = p_vbat = p_ibus = PUMP_INVALID;
 	p2_ibus = PUMP_INVALID;
+	p_tdie_m = p_tdie_s = PUMP_INVALID;
+	p_vbat_reg = 0;
 	if (pump_master[0]) {
 		snprintf(p, sizeof(p), "%s/vbus_mv", pump_master);
 		p_vbus = (int)rd_int(p);
@@ -380,10 +398,17 @@ static void pump_read(void)
 		p_vbat = (int)rd_int(p);
 		snprintf(p, sizeof(p), "%s/ibus_ma", pump_master);
 		p_ibus = (int)rd_int(p);
+		snprintf(p, sizeof(p), "%s/vbat_reg", pump_master);
+		if ((int)rd_int(p) > 0)
+			p_vbat_reg = 1;
+		snprintf(p, sizeof(p), "%s/tdie_raw", pump_master);
+		p_tdie_m = (int)rd_int(p);
 	}
 	if (pump_slave[0]) {
 		snprintf(p, sizeof(p), "%s/ibus_ma", pump_slave);
 		p2_ibus = (int)rd_int(p);
+		snprintf(p, sizeof(p), "%s/tdie_raw", pump_slave);
+		p_tdie_s = (int)rd_int(p);
 	}
 }
 
@@ -416,19 +441,74 @@ static int pps_activate(bool on)
 	return wr(p, on ? 2 : 1);
 }
 
-static int pps_request(int mv, int ma)
+/*
+ * PPS 激活之后，tcpm psy 的 voltage_min/voltage_max/current_max 才反映对端
+ * APDO 的真实能力（内核 tcpm_psy_get_voltage_min/max、get_current_max 在
+ * pps_data.active 时返回 APDO 的值）。
+ *
+ * 硬编码的 PD_BUS_VOLT_MAX_MV / PD_BUS_CURR_MAX_MA（12000mV / 6200mA）来自原厂
+ * DT 的 qcom,usb-icl-ua 等参数，并不等于 APDO 的能力。请求一旦超过 APDO 上限，
+ * 内核 tcpm_psy_set_prop() 的
+ *     if (val->intval > port->pps_data.max_curr * 1000) ret = -EINVAL;
+ * 会直接拒绝，整个 FC2 进入流程随即失败、退避 60 秒后重试 —— 实测每轮都失败
+ * （日志里 "pps activate failed"，且 pps on 从未出现）。
+ */
+static int lim_vmin = -1, lim_vmax = -1, lim_imax = -1;
+
+static void tcpm_limits(int *vmin_mv, int *vmax_mv, int *imax_ma)
 {
 	char p[512];
+	long v;
 
-	if (mv > PD_BUS_VOLT_MAX_MV)
-		mv = PD_BUS_VOLT_MAX_MV;
-	if (ma > PD_BUS_CURR_MAX_MA)
-		ma = PD_BUS_CURR_MAX_MA;
+	*vmin_mv = 0;
+	*vmax_mv = PD_BUS_VOLT_MAX_MV;
+	*imax_ma = PD_BUS_CURR_MAX_MA;
+
+	snprintf(p, sizeof(p), "%s/voltage_min", tcpm_psy);
+	v = rd_int(p);
+	if (v > 0 && v / 1000 < *vmax_mv)
+		*vmin_mv = (int)(v / 1000);
+
+	snprintf(p, sizeof(p), "%s/voltage_max", tcpm_psy);
+	v = rd_int(p);
+	if (v > 0 && v / 1000 < *vmax_mv)
+		*vmax_mv = (int)(v / 1000);
+
+	snprintf(p, sizeof(p), "%s/current_max", tcpm_psy);
+	v = rd_int(p);
+	if (v > 0 && v / 1000 < *imax_ma)
+		*imax_ma = (int)(v / 1000);
+
+	if (*vmin_mv != lim_vmin || *vmax_mv != lim_vmax || *imax_ma != lim_imax) {
+		lim_vmin = *vmin_mv;
+		lim_vmax = *vmax_mv;
+		lim_imax = *imax_ma;
+		logd("tcpm APDO: %d..%d mV, max %d mA\n",
+		     *vmin_mv, *vmax_mv, *imax_ma);
+	}
+}
+
+/* 按 APDO 实际范围钳制；调用者传指针，回来即为真正生效的请求值 */
+static int pps_request(int *mv, int *ma)
+{
+	char p[512];
+	int vmin, vmax, imax;
+
+	tcpm_limits(&vmin, &vmax, &imax);
+	if (*mv > vmax)
+		*mv = vmax;
+	if (*mv < vmin)
+		*mv = vmin;
+	if (*ma > imax)
+		*ma = imax;
+	if (*ma < 0)
+		*ma = 0;
+
 	snprintf(p, sizeof(p), "%s/voltage_now", tcpm_psy);
-	if (wr(p, (long)mv * 1000))
+	if (wr(p, (long)*mv * 1000))
 		return -1;
 	snprintf(p, sizeof(p), "%s/current_now", tcpm_psy);
-	if (wr(p, (long)ma * 1000))
+	if (wr(p, (long)*ma * 1000))
 		return -1;
 	return 0;
 }
@@ -437,7 +517,7 @@ static int pps_request(int mv, int ma)
 static int req_v_mv, req_i_ma;
 static int eff_fcc_ma = PD_BAT_CURR_MAX_MA;
 static int no_need_slave;
-static int cell_high_cnt, over_cell_cnt, tune_retry;
+static int cell_high_cnt, over_cell_cnt, tune_retry, slave_low_cnt;
 static int pps_backoff;
 
 static void fc2_teardown(bool restore_sw)
@@ -465,6 +545,38 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 
 	if (no_need_slave && fcc > FCC_MAX_MASTER_ONLY_MA)
 		fcc = FCC_MAX_MASTER_ONLY_MA;
+
+	/* ---- 泵结温降额环 ----
+	 * 两颗泵取更高的结温；超过 TDIE_DERATE_START_C 后每升高 1℃ 把本轮 fcc
+	 * 收 300mA（下限 TDIE_DERATE_FLOOR_MA），三环控制会跟着把 ibus 目标压下来；
+	 * 到 TDIE_HARD_STOP_C 直接退出 FC2 交给 SW 路径（并退避 10s）。 */
+	{
+		int die_max = PUMP_INVALID;
+
+		if (p_tdie_m != PUMP_INVALID && p_tdie_m > die_max)
+			die_max = p_tdie_m;
+		if (p_tdie_s != PUMP_INVALID && p_tdie_s > die_max)
+			die_max = p_tdie_s;
+
+		if (die_max != PUMP_INVALID && die_max >= TDIE_HARD_STOP_C) {
+			logd("pump die %dC >= %dC, exit fc2\n", die_max,
+			     TDIE_HARD_STOP_C);
+			*next = ST_FC2_EXIT;
+			pps_backoff = 20;   /* 10s 内不再进 FC2 */
+			return 0;
+		}
+		if (die_max != PUMP_INVALID && die_max >= TDIE_DERATE_START_C) {
+			int cap = PD_BAT_CURR_MAX_MA -
+				  (die_max - TDIE_DERATE_START_C) * TDIE_DERATE_STEP_MA;
+
+			if (cap < TDIE_DERATE_FLOOR_MA)
+				cap = TDIE_DERATE_FLOOR_MA;
+			if (cap < fcc) {
+				logd("pump die %dC, fcc %d -> %d\n", die_max, fcc, cap);
+				fcc = cap;
+			}
+		}
+	}
 
 	ibus_limit = fcc / 2 + PD_BUS_CURR_COMP_MA;
 	if (ibus_limit > PD_BUS_CURR_MAX_MA)
@@ -496,19 +608,92 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 		return 0;
 	}
 
-	new_v = vbat_mv * 2 + BUS_VOLT_INIT_UP_MV;
-	new_i = ibus_limit;
-
-	if (slave_on && p2_ibus != PUMP_INVALID && p2_ibus < IBUS_SLAVE_OFF_MA) {
-		pump_set(pump_slave, false);
-		slave_on = false;
-		no_need_slave = 1;
-		logd("slave ibus %d low, single pump\n", p2_ibus);
+	/* 从泵判定：必须等它稳定后再看 ibus。
+	 * 原实现使能后一个循环（0.5s）就读，泵还没爬坡，常被判成"没电流"而关掉。 */
+	if (slave_on && p2_ibus != PUMP_INVALID) {
+		if (p2_ibus < IBUS_SLAVE_OFF_MA) {
+			if (++slave_low_cnt >= SLAVE_SETTLE_TICKS) {
+				pump_set(pump_slave, false);
+				slave_on = false;
+				no_need_slave = 1;
+				logd("slave ibus %d low, single pump\n", p2_ibus);
+			}
+		} else {
+			slave_low_cnt = 0;
+		}
 	}
 
-	if (pps_request(new_v, new_i) == 0) {
-		req_v_mv = new_v;
-		req_i_ma = new_i;
+	/* ================= 原厂三环控制（本次修复的核心）=================
+	 * 参照 stock drivers/power/supply/ti/pd_policy_manager.c：
+	 *   step_vbat / step_ibus / step_ibat 三者取 min，再叠加硬件调节状态
+	 *   (vbat_reg) 与 bus alarm，得到最终步进，累积到请求电压上。
+	 *
+	 * 原实现只按 vbat*2 + 固定偏置算电压（纯电压环、且每轮重算），
+	 * 电流环的"没到目标就继续抬压"这一半完全缺失，结果泵恒定停在
+	 * 电压环的最低点：实测泵输入仅 ~0.5A、电池 ~1.3A，远低于 fcc。
+	 */
+	{
+		int apdo_vmin = 0, apdo_vmax = PD_BUS_VOLT_MAX_MV;
+		int apdo_imax = PD_BUS_CURR_MAX_MA;
+		int v_limit = profile_fv_mv();      /* 按温度档的 CV 限压 */
+		int step_vbat, step_ibus, step_ibat, steps;
+		int ibus_total = (p_ibus == PUMP_INVALID) ? 0 : p_ibus;
+
+		if (slave_on && p2_ibus != PUMP_INVALID)
+			ibus_total += p2_ibus;
+
+		tcpm_limits(&apdo_vmin, &apdo_vmax, &apdo_imax);
+		if (ibus_limit > apdo_imax)
+			ibus_limit = apdo_imax;
+		if (ibus_limit >= HIGH_IBUS_LIMI_THR_MA)
+			ibus_limit += IBUS_TARGET_COMP_MA;
+
+		/* vbat 环：到 CV 点就收 */
+		if (cell_max > v_limit)
+			step_vbat = -FC2_STEPS;
+		else if (cell_max < v_limit - 10)
+			step_vbat = FC2_STEPS;
+		else
+			step_vbat = 0;
+
+		/* ibat 环：电池电流没到 fcc 就继续抬压 */
+		if (ibat_ma < fcc)
+			step_ibat = FC2_STEPS;
+		else if (ibat_ma > fcc + 50)
+			step_ibat = -FC2_STEPS;
+		else
+			step_ibat = 0;
+
+		/* ibus 环：泵输入电流没到目标就继续抬压 */
+		if (ibus_total < ibus_limit - 50)
+			step_ibus = FC2_STEPS;
+		else if (ibus_total > ibus_limit)
+			step_ibus = -FC2_STEPS;
+		else
+			step_ibus = 0;
+
+		steps = step_vbat < step_ibus ? step_vbat : step_ibus;
+		steps = steps < step_ibat ? steps : step_ibat;
+
+		/* 硬件已进入 vbat 调节（泵自身在钳压）：强制降压，原厂 3 倍步长 */
+		if (p_vbat_reg && steps > -3 * FC2_STEPS)
+			steps = -3 * FC2_STEPS;
+
+		new_v = req_v_mv + steps * STEP_MV;
+		if (new_v < vbat_mv * 2)        /* 不能低于 2×VBAT，否则泵饿死 */
+			new_v = vbat_mv * 2;
+		if (new_v > apdo_vmax)
+			new_v = apdo_vmax;
+		new_i = ibus_limit;
+
+		if (pps_request(&new_v, &new_i) == 0) {
+			req_v_mv = new_v;
+			req_i_ma = new_i;
+		}
+		logd("loops vbat=%+d ibus=%+d ibat=%+d steps=%+d req_v=%d vlim=%d "
+		     "ibus_tot=%d fcc=%d die=%d/%d\n", step_vbat, step_ibus,
+		     step_ibat, steps, req_v_mv, v_limit, ibus_total, fcc,
+		     p_tdie_m, p_tdie_s);
 	}
 
 	logd("tune vbat=%d ibat=%d fcc=%d ibus_l=%d vbus=%d req v=%d i=%d "
@@ -609,7 +794,7 @@ int main(int argc, char **argv)
 			req_v_mv = vbat_mv * 2 + BUS_VOLT_INIT_UP_MV;
 			req_i_ma = PD_BUS_CURR_MAX_MA;
 			if (pps_activate(true) == 0 &&
-			    pps_request(req_v_mv, req_i_ma) == 0) {
+			    pps_request(&req_v_mv, &req_i_ma) == 0) {
 				logd("pps on v=%d i=%d\n", req_v_mv, req_i_ma);
 				state = ST_FC2_ENTRY_2;
 				tune_retry = 0;
@@ -628,11 +813,11 @@ int main(int argc, char **argv)
 			if (p_vbus < vbat_mv * 2 + BUS_VOLT_INIT_UP_MV - 50) {
 				tune_retry++;
 				req_v_mv += STEP_MV;
-				pps_request(req_v_mv, req_i_ma);
+				pps_request(&req_v_mv, &req_i_ma);
 			} else if (p_vbus > vbat_mv * 2 + BUS_VOLT_INIT_UP_MV + 200) {
 				tune_retry++;
 				req_v_mv -= STEP_MV;
-				pps_request(req_v_mv, req_i_ma);
+				pps_request(&req_v_mv, &req_i_ma);
 			} else {
 				logd("vbus tuned (%d retries)\n", tune_retry);
 				state = ST_FC2_ENTRY_3;
@@ -646,17 +831,18 @@ int main(int argc, char **argv)
 
 		case ST_FC2_ENTRY_3:
 			sw_enable(false);   /* stock fc2_disable_sw */
-			/* vendor bq2597x 顺序：先从泵后主泵（LN8000 才是主先） */
+			/* 原厂顺序：先 master 后 slave（usbpd_pm_enable_cp → _cp_sec）。
+			 * 实测从泵必须在主泵已经工作之后才会爬坡：先开从泵时它恒为
+			 * 6~7mA（然后被判死），先开主泵后从泵 4s 内就能到 1.2A。 */
+			if (!master_on) {
+				pump_set(pump_master, true);
+				master_on = true;
+				usleep(200000);
+			}
 			if (!slave_on && pump_slave[0] &&
 			    cap_pct < CAP_HIGH_THR && temp_ddc < 460) {
 				pump_set(pump_slave, true);
 				slave_on = true;
-				usleep(30000);
-			}
-			if (!master_on) {
-				pump_set(pump_master, true);
-				master_on = true;
-				usleep(30000);
 			}
 			no_need_slave = slave_on ? 0 : 1;
 			if (master_on) {

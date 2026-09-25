@@ -1,0 +1,9 @@
+[Unit]
+Description=Enable BQ2597x charge-pump TDIE ADC scan
+After=multi-user.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/elish-pump-tdie
+[Install]
+WantedBy=multi-user.target

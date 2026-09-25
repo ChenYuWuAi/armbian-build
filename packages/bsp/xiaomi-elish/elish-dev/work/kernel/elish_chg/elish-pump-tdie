@@ -1,0 +1,10 @@
+#!/bin/sh
+# 两颗 BQ2597x 电荷泵的 REG_15 bit0 = TDIE_ADC_DIS，默认置 1，清掉之后
+# tdie_raw 才有读数。驱动源码已改为 probe 时直接使能，但当前运行的内核
+# 模块无法重载（[permanent]），所以用这个 oneshot 每个启动周期补一次，幂等。
+for a in 65 66; do
+	cur=$(i2cget -f -y 15 0x"$a" 0x15 2>/dev/null) || continue
+	new=$(printf '0x%02x' $(( cur & ~1 )))
+	[ "$cur" = "$new" ] || i2cset -f -y 15 0x"$a" 0x15 "$new"
+done
+exit 0

@@ -1695,10 +1695,12 @@ static int bq2597x_init_adc(struct bq2597x *bq)
 	bq2597x_set_adc_scan(bq, ADC_VBUS, true);
 	bq2597x_set_adc_scan(bq, ADC_VOUT, false);
 	bq2597x_set_adc_scan(bq, ADC_VBAT, true);
-	bq2597x_set_adc_scan(bq, ADC_IBAT, false);
+	bq2597x_set_adc_scan(bq, ADC_IBAT, true);   /* 电池侧电流，三环控制用得上 */
 	bq2597x_set_adc_scan(bq, ADC_TBUS, false);
 	bq2597x_set_adc_scan(bq, ADC_TBAT, false);
-	bq2597x_set_adc_scan(bq, ADC_TDIE, false);
+	/* TDIE_ADC_DIS(REG_15 bit0) 默认是 1，不清掉 tdie_raw 恒为 0。
+	 * 结温降额环依赖它，必须显式使能。 */
+	bq2597x_set_adc_scan(bq, ADC_TDIE, true);
 	bq2597x_set_adc_scan(bq, ADC_VAC, true);
 
 	if (bq->chip_vendor == SC8551) {
