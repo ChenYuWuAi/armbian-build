@@ -88,6 +88,8 @@ static const int thermal_fcc_pps_bq[] = {
 #define JEITA_CP_HYST_DDC           20
 #define THERM_LEVEL_THRESHOLD       12
 #define THERM_LEVEL_FOR_DUAL_BQ      9
+/* 原厂 dual_fuel_gauge_class.c 的 JEITA_COOL_THR_DEGREE：温度合成用 */
+#define FG_COOL_THR_DDC            150
 
 /* thermal-mitigation-pd-base (ICL ladder for the SW path, uA) */
 static const int thermal_icl_pd[] = {
@@ -255,10 +257,11 @@ static int find_paths(void)
 
 /* ======== battery ======== */
 static int vcell0_mv, vcell1_mv, vbat_mv, ibat_ma, cap_pct, temp_ddc;
+static int tcell0_ddc, tcell1_ddc;   /* 两颗表计各自的温度（temp_ddc 取两者较高） */
 
 static int battery_read(void)
 {
-	long v0, v1, i0, i1, t, c;
+	long v0, v1, i0, i1, t0, t1, c0, c1, f0, f1;
 	char p[512];
 
 	snprintf(p, sizeof(p), "%s/voltage_now", gauge0);
@@ -270,23 +273,48 @@ static int battery_read(void)
 	snprintf(p, sizeof(p), "%s/current_now", gauge1);
 	i1 = rd_int(p);
 	snprintf(p, sizeof(p), "%s/temp", gauge0);
-	t = rd_int(p);
+	t0 = rd_int(p);
 	snprintf(p, sizeof(p), "%s/temp", gauge1);
-	c = rd_int(p);
-	if (t == LONG_MIN)
-		c = t;   /* keep one invalid check */
+	t1 = rd_int(p);
 	snprintf(p, sizeof(p), "%s/capacity", gauge0);
-	c = rd_int(p);
+	c0 = rd_int(p);
+	snprintf(p, sizeof(p), "%s/capacity", gauge1);
+	c1 = rd_int(p);
+	snprintf(p, sizeof(p), "%s/charge_full", gauge0);
+	f0 = rd_int(p);
+	snprintf(p, sizeof(p), "%s/charge_full", gauge1);
+	f1 = rd_int(p);
+
 	if (v0 == LONG_MIN || v1 == LONG_MIN || i0 == LONG_MIN ||
-	    i1 == LONG_MIN || t == LONG_MIN || c == LONG_MIN)
+	    i1 == LONG_MIN || t0 == LONG_MIN || t1 == LONG_MIN ||
+	    c0 == LONG_MIN || c1 == LONG_MIN)
 		return -1;
 
+	/* 电池是 1S2P（DT battery-pack: 4.45V / 8600mAh，原厂 fv-max-uv=4.5V），
+	 * 以下合成规则照抄原厂 dual_fuel_gauge_class.c：
+	 *   fg_read_volt():    MAX(两芯)
+	 *   fg_read_current(): 两芯之和
+	 *   fg_read_system_soc(): 按两颗 FCC 加权平均
+	 *   fg_read_temperature(): 任一颗 <= 15.0C 取 MIN，否则取 MAX */
 	vcell0_mv = v0 / 1000;
 	vcell1_mv = v1 / 1000;
 	vbat_mv = vcell0_mv > vcell1_mv ? vcell0_mv : vcell1_mv;
 	ibat_ma = (int)(i0 / 1000) + (int)(i1 / 1000);
-	temp_ddc = (int)t;
-	cap_pct = (int)c;
+
+	tcell0_ddc = (int)t0;
+	tcell1_ddc = (int)t1;
+	if (t0 <= FG_COOL_THR_DDC || t1 <= FG_COOL_THR_DDC)
+		temp_ddc = (int)(t0 < t1 ? t0 : t1);
+	else
+		temp_ddc = (int)(t0 > t1 ? t0 : t1);
+
+	if (f0 > 0 && f1 > 0) {
+		long rate0 = f0 * 100 / (f0 + f1);
+
+		cap_pct = (int)((rate0 * c0 + (100 - rate0) * c1 + 50) / 100);
+	} else {
+		cap_pct = (int)((c0 + c1 + 1) / 2);
+	}
 	return 0;
 }
 
@@ -776,8 +804,9 @@ static int fc2_tune(int *next, int profile_fcc_ma)
 	}
 
 	logd("tune vbat=%d ibat=%d fcc=%d ibus_l=%d vbus=%d req v=%d i=%d "
-	     "cell=%d t=%d\n", vbat_mv, ibat_ma, eff_fcc_ma, ibus_limit,
-	     p_vbus, req_v_mv, req_i_ma, cell_max, temp_ddc);
+	     "cell=%d t=%d(%d/%d)\n", vbat_mv, ibat_ma, eff_fcc_ma, ibus_limit,
+	     p_vbus, req_v_mv, req_i_ma, cell_max, temp_ddc,
+	     tcell0_ddc, tcell1_ddc);
 	return 0;
 }
 
@@ -795,6 +824,26 @@ int main(int argc, char **argv)
 			tdie_stop_c = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "--selftest"))
 			return selftest();
+		else if (!strcmp(argv[i], "--read")) {
+			/* 只读一次两颗表计，打印生效的温度/容量（诊断取温是否正确） */
+			if (find_paths()) {
+				fprintf(stderr, "缺少路径\n");
+				return 1;
+			}
+			if (battery_read()) {
+				fprintf(stderr, "读取表计失败\n");
+				return 1;
+			}
+			printf("cell0=%d.%dC cell1=%d.%dC -> temp_ddc=%d.%dC (取较高)\n",
+			       tcell0_ddc / 10, tcell0_ddc % 10,
+			       tcell1_ddc / 10, tcell1_ddc % 10,
+			       temp_ddc / 10, temp_ddc % 10);
+			printf("vbat=%dmV cell0=%dmV cell1=%dmV ibat=%dmA cap=%d%%\n",
+			       vbat_mv, vcell0_mv, vcell1_mv, ibat_ma, cap_pct);
+			printf("thermal_level=%d -> fcc 上限 %d mA\n",
+			       thermal_level(), thermal_fcc_pps_bq[thermal_level()] / 1000);
+			return 0;
+		}
 		else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			printf("用法: %s [-q] [--tdie-start C] [--tdie-stop C] [--selftest]\n",
 			       argv[0]);

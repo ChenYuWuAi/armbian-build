@@ -20,6 +20,7 @@
 
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/of.h>
 #include <linux/power_supply.h>
 #include <linux/workqueue.h>
 #include <linux/math64.h>
@@ -68,8 +69,9 @@ static void elish_batt_poll(struct work_struct *w)
 	struct elish_batt *b = container_of(to_delayed_work(w),
 					    struct elish_batt, poll);
 	int i, n = 0;
-	int capacity = 100, temp = 0, vsum = 0, isum = 0;
-	s64 psum = 0;
+	int vmax = 0, isum = 0, tmax = -1000, tmin = 1000;
+	s64 cap_num = 0;
+	int cap_den = 0;
 	int any_chg = 0, any_dis = 0, any_full = 0, any_present = 0;
 	int status;
 
@@ -93,18 +95,23 @@ static void elish_batt_poll(struct work_struct *w)
 		n++;
 		any_present = 1;
 
-		if (cell_get(psy, POWER_SUPPLY_PROP_VOLTAGE_NOW, &v) == 0) {
-			vsum += v;
-			if (cell_get(psy, POWER_SUPPLY_PROP_CURRENT_NOW, &c) == 0) {
-				isum += c;
-				psum += div_s64((s64)v * c, 1000000);
-			}
+		if (cell_get(psy, POWER_SUPPLY_PROP_VOLTAGE_NOW, &v) == 0 &&
+		    v > vmax)
+			vmax = v;
+		if (cell_get(psy, POWER_SUPPLY_PROP_CURRENT_NOW, &c) == 0)
+			isum += c;
+		if (cell_get(psy, POWER_SUPPLY_PROP_TEMP, &t) == 0) {
+			if (t > tmax)
+				tmax = t;
+			if (t < tmin)
+				tmin = t;
 		}
 		if (cell_get(psy, POWER_SUPPLY_PROP_CAPACITY, &c) == 0 &&
-		    c < capacity)
-			capacity = c;
-		if (cell_get(psy, POWER_SUPPLY_PROP_TEMP, &t) == 0 && t > temp)
-			temp = t;
+		    cell_get(psy, POWER_SUPPLY_PROP_CHARGE_FULL, &v) == 0 &&
+		    v > 0) {
+			cap_num += (s64)v * c;   /* 按 FCC 加权（原厂 fg_read_system_soc） */
+			cap_den += v;
+		}
 		if (cell_get(psy, POWER_SUPPLY_PROP_STATUS, &s) == 0) {
 			if (s == POWER_SUPPLY_STATUS_CHARGING)
 				any_chg = 1;
@@ -126,12 +133,19 @@ static void elish_batt_poll(struct work_struct *w)
 	else
 		status = POWER_SUPPLY_STATUS_UNKNOWN;
 
+	/* 合成规则照抄原厂 dual_fuel_gauge_class.c（本机电池是 1S2P：
+	 * DT battery-pack = 4.45V / 8600mAh / 33.2Wh，原厂 fv-max-uv = 4.5V）：
+	 *   电压 fg_read_volt()        = MAX(两芯)
+	 *   电流 fg_read_current()     = 两芯之和
+	 *   容量 fg_read_system_soc()  = 按两颗 FCC 加权平均
+	 *   温度 fg_read_temperature() = 任一颗 <=15.0C 取 MIN，否则取 MAX
+	 *   功率 = 电压 * 电流 */
 	int new_status = status;
-	int new_cap = n ? capacity : 0;
-	int new_v = n ? vsum : 0;
-	int new_i = n ? isum / n : 0;
-	int new_p = n ? (int)psum : 0;
-	int new_t = n ? temp : 0;
+	int new_cap = cap_den > 0 ? (int)((cap_num + cap_den / 2) / cap_den) : 0;
+	int new_v = n ? vmax : 0;
+	int new_i = n ? isum : 0;
+	int new_p = n ? (int)div_s64((s64)vmax * isum, 1000000) : 0;
+	int new_t = n ? ((tmin <= 150) ? tmin : tmax) : 0;
 	bool changed;
 
 	mutex_lock(&b->lock);
@@ -244,7 +258,9 @@ static int __init elish_batt_init(void)
 	}
 
 	cfg.drv_data = eb;
-	/* 用第一颗表计的设备当 parent，避免 "Expected proper parent device" */
+	/* 设计容量指向整包节点 battery-pack（4.45V / 8600mAh / 33.2Wh）。默认会从
+	 * 表计节点继承单芯的 4.3Ah / 16.6Wh，upower/Vitals 会看到一半容量。 */
+	cfg.of_node = of_find_node_by_name(NULL, "battery-pack");
 	eb->psy = power_supply_register(eb->cells[0] ? &eb->cells[0]->dev : NULL,
 					&elish_batt_desc, &cfg);
 	if (IS_ERR(eb->psy)) {
