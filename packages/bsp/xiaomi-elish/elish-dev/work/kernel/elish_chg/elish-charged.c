@@ -875,6 +875,23 @@ int main(int argc, char **argv)
 		tcpm_read();
 		pump_read();
 
+		/* thermal level 变化时单独记一行，现场一眼能确认热控在动作 */
+		{
+			static int last_level = -1;
+			int lv = thermal_level();
+
+			if (lv != last_level) {
+				logd("thermal level %d -> %d：电池 %d.%dC "
+				     "(两芯 %d.%d/%d.%d), fcc 上限 %d mA\n",
+				     last_level < 0 ? 0 : last_level, lv,
+				     temp_ddc / 10, temp_ddc % 10,
+				     tcell0_ddc / 10, tcell0_ddc % 10,
+				     tcell1_ddc / 10, tcell1_ddc % 10,
+				     thermal_fcc_pps_bq[lv] / 1000);
+				last_level = lv;
+			}
+		}
+
 		/* ---- global safety gate: jeita window ---- */
 		if (temp_ddc > JEITA_TOO_HOT_DDC ||
 		    temp_ddc < JEITA_TOO_COLD_DDC) {
