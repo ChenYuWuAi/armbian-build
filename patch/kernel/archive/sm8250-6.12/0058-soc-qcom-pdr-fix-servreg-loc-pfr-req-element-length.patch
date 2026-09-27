@@ -1,0 +1,32 @@
+--- a/include/linux/soc/qcom/pdr.h
++++ b/include/linux/soc/qcom/pdr.h
+@@ -5,6 +5,7 @@
+ #include <linux/soc/qcom/qmi.h>
+ 
+ #define SERVREG_NAME_LENGTH	64
++#define SERVREG_PFR_LENGTH	256
+ 
+ struct pdr_service;
+ struct pdr_handle;
+--- a/drivers/soc/qcom/pdr_internal.h
++++ b/drivers/soc/qcom/pdr_internal.h
+@@ -84,7 +84,7 @@
+ 
+ struct servreg_loc_pfr_req {
+ 	char service[SERVREG_NAME_LENGTH + 1];
+-	char reason[257];
++	char reason[SERVREG_PFR_LENGTH + 1];
+ };
+ 
+ struct servreg_loc_pfr_resp {
+--- a/drivers/soc/qcom/qcom_pdr_msg.c
++++ b/drivers/soc/qcom/qcom_pdr_msg.c
+@@ -326,7 +326,7 @@
+ 	},
+ 	{
+ 		.data_type = QMI_STRING,
+-		.elem_len = SERVREG_NAME_LENGTH + 1,
++		.elem_len = SERVREG_PFR_LENGTH + 1,
+ 		.elem_size = sizeof(char),
+ 		.array_type = VAR_LEN_ARRAY,
+ 		.tlv_type = 0x02,
