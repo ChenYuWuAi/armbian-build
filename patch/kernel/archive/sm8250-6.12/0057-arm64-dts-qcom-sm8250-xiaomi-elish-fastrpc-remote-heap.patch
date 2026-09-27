@@ -1,0 +1,42 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi
+@@ -1164,3 +1164,39 @@
+ 		opp-peak-kBps = <8368000 51609600>;
+ 	};
+ };
++
++/*
++ * fastrpc remote heap for ADSP / CDSP / SLPI.
++ *
++ * qcom,fastrpc needs a reserved DMA region (of_reserved_mem_device_init())
++ * so the DSPs can load files from the host filesystem: sensor registry
++ * files for the SLPI, audio/compute modules for the ADSP/CDSP.  Without it
++ * every fastrpc instance prints
++ *     "qcom,fastrpc ...: no reserved DMA memory for FASTRPC"
++ * and the SLPI sensor_process user PD stalls waiting for its registry,
++ * tripping the USER-PD watchdog ("dog_virtual_user.c:240") which crashes
++ * the whole remoteproc every ~40 s and stalls the system.
++ *
++ * Matches postmarketOS soc/qualcomm-sm8250 MR !12
++ * ("remote heap CMA for ADSP, CDSP, SLPI") and pmaports#4064
++ * ("Sensors broken on Elish/Enuma").
++ */
++&{/reserved-memory} {
++	fastrpc_heap: fastrpc-heap@fdc00000 {
++		compatible = "shared-dma-pool";
++		reg = <0x0 0xfdc00000 0x0 0x2000000>;
++		reusable;
++	};
++};
++
++&{/soc@0/remoteproc@17300000/glink-edge/fastrpc} {
++	memory-region = <&fastrpc_heap>;
++};
++
++&{/soc@0/remoteproc@8300000/glink-edge/fastrpc} {
++	memory-region = <&fastrpc_heap>;
++};
++
++&{/soc@0/remoteproc@5c00000/glink-edge/fastrpc} {
++	memory-region = <&fastrpc_heap>;
++};
